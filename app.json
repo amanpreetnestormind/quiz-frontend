@@ -1,0 +1,41 @@
+{
+  "expo": {
+    "name": "IQ-Test-Quiz-App",
+    "slug": "iq-test-quiz-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "plugins": [
+      [
+        "expo-facebook",
+        {
+          "userTrackingPermission": false
+        }
+      ]
+    ],
+    "splash": {},
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "facebookScheme": "fb504762654377990",
+    "facebookAppId": "504762654377990",
+    "facebookDisplayName": "quiz-app",
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "package": "quiz_native.app",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#FFFFFF"
+      }
+    },
+    "web": {
+      "favicon": "./assets/icon.png"
+    },
+    "description": ""
+  }
+}
