@@ -2,13 +2,13 @@ import React, { useEffect, useState } from 'react'
 import { Text, View, ActivityIndicator, Animated, Image, ImageBackground, Platform, StatusBar, StyleSheet, TouchableOpacity, TouchableWithoutFeedback } from "react-native"
 import { useDispatch, useSelector } from "react-redux"
 import colors from "../../theme/colors"
-import { getToken } from '../services/common_functions'
+import { getToken, removeItemValue, replaceString } from '../services/common_functions'
 import { getQuestion } from '../services/redux/action/actions'
-import { AntDesign, MaterialCommunityIcons } from '@expo/vector-icons'
-import { SvgUri } from 'react-native-svg'
-import FacebookImage from '../../assets/facebook.svg'
+import { AntDesign } from '@expo/vector-icons'
+import { BackHandler } from 'react-native'
 
 const Quiz_comp = ({ navigation }) => {
+
     const [animationState, setAnimationState] = useState({
         ready: false,
         SlideInLeft: new Animated.Value(0),
@@ -39,6 +39,7 @@ const Quiz_comp = ({ navigation }) => {
     const [loginUser, setLoginUser] = useState('')
     const [isBlinking, setIsBlinking] = useState(false)
     const [blinkingInterval, setBlinkingInterval] = useState(false);
+    const [correctAnswerCount, setCorrectAnswerCount] = useState(0)
 
     const getUser = async () => {
         const user = await getToken("quiz_app.user")
@@ -49,11 +50,6 @@ const Quiz_comp = ({ navigation }) => {
     useEffect(() => {
         getUser()
         dispatch(getQuestion())
-        setIsLoading(true)
-        // setAnimationState({
-        //     ...animationState,
-        //     slideUpValue: new Animated.Value(0)
-        // })
 
         if (!blinkingInterval) {
             setBlinkingInterval(setInterval(() => {
@@ -86,8 +82,7 @@ const Quiz_comp = ({ navigation }) => {
         _start()
         if (isLoading) {
             setTimeout(() => {
-                setIsLoading(false)
-            }, 4000)
+            }, 2000)
         }
     }, [isRestart, isLoading])
 
@@ -102,7 +97,6 @@ const Quiz_comp = ({ navigation }) => {
     }
 
     return <View style={[styles["main-container"]]}>
-        <StatusBar barStyle="light-content" hidden={false} />
         {isLoading && <View style={{
             alignItems: "center",
             justifyContent: "center",
@@ -110,10 +104,27 @@ const Quiz_comp = ({ navigation }) => {
         }}>
             <ActivityIndicator color="#fff" size="large" />
         </View>}
+        <View style={{
+            backgroundColor: colors.primary,
+        }}>
+            <StatusBar barStyle="light-content" hidden={false} />
+            <View
+                style={[
+                    styles['card-container']
+                ]}>
+                <Image
+                    source={require('../../assets/robinCartoon.png')}
+                    style={[
+                        styles['card-image']
+                    ]} />
+                <Text
+                    style={[styles['card-name-text']]}>Robin Sharma</Text>
+            </View>
+        </View>
         {!isLoading && currentIndex <= 10 && <View style={[
             styles["top-bar"]
         ]}>
-            <Text style={styles['quiz-type']}>IQ-Test</Text>
+            <Text style={styles['quiz-type']}>Animals Quiz</Text>
             <Text style={[
                 styles['question-title']
             ]}>Question
@@ -121,48 +132,23 @@ const Quiz_comp = ({ navigation }) => {
                     styles['question-number']
                 ]}> {currentIndex}/10</Text>
             </Text>
-            {/* <View style={{
-                display: "flex",
-                flexDirection: "row",
-                width:"100%",
-                justifyContent:"space-between"
-            }}>
-                {Array.from(Array(10), (e, i) => (<Text style={{
-                    color: "#fff",
-                }}>-</Text>))}
-            </View> */}
-            {/* <View style={{
-                borderWidth: 1,
-                marginTop: 10,
-                borderColor: "#fff",
-                borderStyle: "dotted"
-            }}></View> */}
         </View>}
-
-        {/* {!isLoading && <View style={{
-            position: "absolute",
-            right: Platform.OS === "ios" ? 10 : 5,
-            top: Platform.OS === "ios" ? 0 : 5
-        }}>
-            <MaterialCommunityIcons name="logout" size={24} color="#fff" onPress={() => {
-
-            }} />
-        </View>} */}
 
         {!isLoading && currentIndex <= 10 && <Animated.View style={[
             styles['question-container'],
             {
-                transform: [
-                    {
-                        translateX: animationState.slideUpValue.interpolate({
-                            inputRange: [0, 1],
-                            outputRange: [-600, 0]
-                        })
-                    }
-                ]
+                // transform: [
+                //     {
+                //         translateX: animationState.slideUpValue.interpolate({
+                //             inputRange: [0, 1],
+                //             outputRange: [-600, 0]
+                //         })
+                //     }
+                // ]
             }
         ]}>
             {questions?.map((question, index) => {
+
                 function getRandomInt(max) {
                     return Math.floor(Math.random() * max);
                 }
@@ -173,27 +159,37 @@ const Quiz_comp = ({ navigation }) => {
 
                 if (index + 1 == currentIndex) {
                     answer.correctAnswer = question.correct_answer
-
                     return <View key={index} style={{
                         width: "100%"
                     }}>
                         <Text style={[
                             isBlinking && styles.textGlowing
-                        ]}>{question?.question}</Text>
+                        ]}>{replaceString(question?.question)}</Text>
                         <View style={styles.answerContainer}>
+                            {/* <Text style={{
+                                    color: "#fff"
+                                }}>
+                                    {question.correct_answer}
+                                    {correctAnswerCount}
+                                </Text> */}
                             {question.incorrect_answers?.map((ans, i) => (<AnimatedClick
                                 disabled={answerSubmit}
                                 key={i}
                                 style={[
                                     selectedIndex === i ?
-                                        {
+                                        output.wrongAnswer ? {
+                                            ...styles.answerButton,
+                                            backgroundColor: output.wrongAnswer ? "red" : "",
+                                            borderColor: output.wrongAnswer ? "red" : ""
+                                        } : {
                                             ...styles.answerButton,
                                             backgroundColor: output.wrongAnswer ? "red" : colors.primary,
                                             borderColor: output.wrongAnswer ? "red" : colors.buttons.primary.background
                                         } :
                                         { ...styles.answerButton },
                                     answer.correctAnswer === ans && style == true ? {
-                                        ...styles.answerButton, ...styles.correctAnswer
+                                        ...styles.answerButton,
+                                        ...styles.correctAnswer
                                     } : {}
                                 ]}
                                 onPress={() => {
@@ -209,12 +205,18 @@ const Quiz_comp = ({ navigation }) => {
                                     selectedIndex === i ?
                                         {
                                             ...styles.answerText,
-                                            ...styles.selectedText
+                                            ...styles.selectedText,
                                         } : { ...styles.answerText },
                                     answer.correctAnswer === ans && style == true ?
-                                        { ...styles.answerText, ...styles.correctAnswer } :
-                                        { color: colors.text.primary },
-                                ]}>{ans}</Text>
+                                        {
+                                            ...styles.answerText,
+                                            ...styles.correctAnswer,
+                                            color: colors.buttons.primary.background,
+                                        } :
+                                        {
+                                            color: selectedIndex === i && !output.wrongAnswer ? colors.buttons.primary.background : colors.text.primary
+                                        },
+                                ]}>{replaceString(ans)}</Text>
                                 <Text style={[
                                     selectedIndex === i ?
                                         styles['radio-icon-selected'] :
@@ -227,10 +229,14 @@ const Quiz_comp = ({ navigation }) => {
                                         textAlign: "center"
                                     }
                                 ]}>
-                                    {selectedIndex === i && <AntDesign style={{
+                                    {/* {selectedIndex === i && <AntDesign style={{
                                         alignSelf: "center"
 
-                                    }} name="check" size={18} color={output.wrongAnswer ? "red" : "#fff"} />}
+                                    }} name="check" size={18} color={output.wrongAnswer ? "red" : "#fff"} />} */}
+                                    {/* <AntDesign style={{
+                                        alignSelf: "center"
+
+                                    }} name="check" size={18} color={output.wrongAnswer ? "red" : "#fff"} /> */}
                                 </Text>
                             </AnimatedClick>))}
                         </View>
@@ -239,51 +245,91 @@ const Quiz_comp = ({ navigation }) => {
             })}
             {!isLoading && <View style={[styles['footer']]}>
                 <View style={styles['buttonContainer']}>
-                    <TouchableOpacity
-                        style={{
-                            ...styles.next,
-                            display: currentIndex > 10 ? "none" : "flex",
-                        }}
-                        disabled={isNext}
-                        onPress={() => {
-                            if (answer.correctAnswer === output.selectedAnswer) {
-                                setOutput({
-                                    ...output,
-                                    count: output.count + 1,
-                                })
+                    <View
+                        style={[
+                            {
+                                width: "50%",
+                                paddingLeft: 5,
+                                paddingRight: 5
+                            },
+                        ]}>
+                        <TouchableOpacity
+                            style={{
+                                ...styles.quit,
+                                display: currentIndex > 10 ? "none" : "flex",
+                            }}
+                            onPress={() => {
+                                removeItemValue('quiz_app.user', navigation.navigate)
+                            }}>
+                            <View style={{
+                                display: "flex",
+                                flexDirection: "row",
+                                justifyContent: "center",
+                                alignItems: "center"
+                            }}>
+                                <Image source={require('../../assets/logout.png')} style={{
+                                    marginRight: 6,
+                                    height: 25,
+                                    width: 25
+                                }} />
+                                <Text style={styles['quit-text']}>Quit</Text>
+                            </View>
+                        </TouchableOpacity>
+                    </View>
+                    <View
+                        style={[
+                            {
+                                width: "50%",
+                                paddingLeft: 5,
+                                paddingRight: 5
                             }
-                            if (answer.correctAnswer != output.selectedAnswer) {
-                                setOutput({
-                                    ...output,
-                                    wrongAnswer: true
-                                })
-                            }
-                            // if (currentIndex == questions.length) setCurrentIndex(0)
-                            setAnswerSubmit(true)
-                            setIsNext(true)
-                            setTimeout(() => {
+                        ]}
+                    >
+                        <TouchableOpacity
+                            style={{
+                                ...styles.next,
+                                display: currentIndex > 10 ? "none" : "flex",
+                            }}
+                            disabled={isNext}
+                            onPress={() => {
+                                if (answer.correctAnswer === output.selectedAnswer) {
+                                    setOutput({
+                                        ...output,
+                                        count: output.count + 1,
+                                    })
+                                    setCorrectAnswerCount(oldState => {
+                                        oldState = oldState + 1
+                                        return oldState
+                                    })
+                                }
+                                if (answer.correctAnswer != output.selectedAnswer) {
+                                    setOutput({
+                                        ...output,
+                                        wrongAnswer: true
+                                    })
+                                }
+                                // if (currentIndex == questions.length) setCurrentIndex(0)
+                                setAnswerSubmit(true)
+                                setIsNext(true)
                                 setIsNext(true)
                                 setStyle(false)
                                 setSelectedIndex(null)
                                 setAnswerSubmit(false)
-                                setIsLoading(true)
-                                // setAnimationState({
-                                //     ...animationState,
-                                //     slideUpValue: new Animated.Value(0)
-                                // })
+                                // setIsLoading(true)
                                 setOutput({
                                     ...output,
                                     wrongAnswer: false
                                 })
                                 setCurrentIndex(currentIndex + 1)
-                            }, 3000)
-                        }}>
-                        <Text style={styles.nextText}>Next</Text>
-                    </TouchableOpacity>
+                            }}>
+                            <Text style={styles.nextText}>Next</Text>
+                        </TouchableOpacity>
+                    </View>
+
                 </View>
             </View>}
-        </Animated.View>
-        }
+        </Animated.View>}
+
         {!isLoading && currentIndex >= 11 && <View style={styles['result-page']}>
             <Text style={[
                 styles['result-page-title'],
@@ -295,25 +341,18 @@ const Quiz_comp = ({ navigation }) => {
             <View style={{
                 width: "60%",
                 height: "30%",
+                alignItems: "center",
+                justifyContent: "center"
             }}>
-                <ImageBackground source={require('../../assets/images/trophy.webp')}
-                    style={{
-                        height: "100%", width: "100%",
-                        alignItems: "center"
-                    }}
-                >
-                    <Image source={require('../../assets/images/person3.png')} style={{
-                        borderRadius: 50,
-                        height: 80,
-                        width: 80,
-                        top: Platform.OS === "ios" ? 19 : 2.2
-                    }} />
-                </ImageBackground>
+                <Image source={require('../../assets/gold-cup.png')} style={{
+                    height: 150,
+                    width: 150,
+                }} />
 
             </View>
             <View style={{
                 alignItems: "center",
-                marginTop: 20,
+                marginTop: 0,
             }}>
                 <Text style={[
                     styles['result-page-title'],
@@ -321,15 +360,15 @@ const Quiz_comp = ({ navigation }) => {
                         fontSize: 30,
                         fontWeight: "bold",
                         marginTop: 10,
-                        width: 250,
+                        minWidth: 250,
                         textAlign: "center"
                     }
                 ]}>Congratulation!</Text>
                 <Text style={[
                     styles['result-page-title'],
                     {
-                        fontSize: 16,
-                        marginTop: 10,
+                        fontSize: 14,
+                        marginTop: 0,
                         textAlign: "center",
                         letterSpacing: .5,
                         lineHeight: 25,
@@ -342,12 +381,12 @@ const Quiz_comp = ({ navigation }) => {
                     styles['result-page-title'],
                     {
                         fontSize: 18,
-                        marginTop: 15,
+                        marginTop: 5,
                         textAlign: "center",
                         letterSpacing: .5,
                         lineHeight: 25,
                         textTransform: "uppercase",
-                        color: colors.text.secondary,
+                        color: "#FFD700",
                         width: 250
                     }
                 ]}>
@@ -358,7 +397,7 @@ const Quiz_comp = ({ navigation }) => {
                     styles['result-page-title'],
                     {
                         fontSize: 45,
-                        marginTop: 15,
+                        marginTop: 5,
                         textAlign: "center",
                         letterSpacing: .5,
                         textTransform: "uppercase",
@@ -367,39 +406,85 @@ const Quiz_comp = ({ navigation }) => {
                 ]}>
                     <Text style={{
                         color: "#00DAFF",
-                    }}>{output.count}</Text>/10
+                    }}>{correctAnswerCount}</Text>/10
                 </Text>
             </View>
         </View>}
-        {!isLoading && currentIndex >= 11 && <View style={{
-            height: "10%",
-            width: "100%",
-            justifyContent: "center",
-            alignItems: "center"
-        }}>
-            <TouchableOpacity style={{
-                height: 50,
-                backgroundColor: colors.buttons.primary.background,
-                width: "100%",
-                borderWidth: 1,
-                borderColor: colors.buttons.primary.background,
-                borderRadius: 8,
-                alignItems: "center",
-                justifyContent: "center"
-            }}
-                onPress={() => {
-                    setIsRestart(true)
-                    setIsLoading(true)
-                }}>
-                <Text style={{
-                    color: colors.text.primary,
-                    fontWeight: "700",
-                    fontSize: 25,
-                    textTransform: "uppercase"
-                }}>Start Again</Text>
-            </TouchableOpacity>
+        {!isLoading && currentIndex >= 11 && <View style={[styles['footer']]}>
+            <View style={styles['buttonContainer']}>
+                <View
+                    style={[
+                        {
+                            width: "50%",
+                            paddingLeft: 5,
+                            paddingRight: 5
+                        },
+                    ]}>
+                    <TouchableOpacity
+                        style={{
+                            ...styles.quit,
+                            display: currentIndex <= 10 ? "none" : "flex",
+                        }}
+                        disabled={isNext}
+                        onPress={() => {
+                            BackHandler.exitApp()
+                        }}>
+                        <View style={{
+                            display: "flex",
+                            flexDirection: "row",
+                            justifyContent: "center",
+                            alignItems: "center"
+                        }}>
+                            <Image source={require('../../assets/logout.png')} style={{
+                                marginRight: 6,
+                                height: 25,
+                                width: 25
+                            }} />
+                            <Text style={styles['quit-text']}>Quit</Text>
+                        </View>
+                    </TouchableOpacity>
+                </View>
+                <View
+                    style={[
+                        {
+                            width: "50%",
+                            paddingLeft: 5,
+                            paddingRight: 5
+                        }
+                    ]}
+                >
+                    <TouchableOpacity style={{
+                        height: 50,
+                        backgroundColor: colors.buttons.primary.background,
+                        width: "100%",
+                        borderWidth: 1,
+                        borderColor: colors.buttons.primary.background,
+                        borderRadius: 8,
+                        alignItems: "center",
+                        justifyContent: "center",
+                        ...styles.next
+                    }}
+                        onPress={() => {
+                            setIsRestart(true)
+                            setCorrectAnswerCount(0)
+                            // setIsLoading(true)
+                        }}>
+                        <Text style={{
+                            // ...styles.nextText,
+                            color: colors.text.primary,
+                            fontWeight: "700",
+                            fontSize: 20,
+                            minWidth: 200,
+                            textTransform: "uppercase",
+                            textAlign: "center",
+                            justifyContent: "center",
+                            alignItems: "center"
+                        }}>Start Again</Text>
+                    </TouchableOpacity>
+                </View>
+            </View>
         </View>}
-    </View >
+    </View>
 }
 
 export default Quiz_comp
@@ -408,29 +493,32 @@ const styles = StyleSheet.create({
     'main-container': {
         flex: 1,
         backgroundColor: colors.primary,
-        paddingTop: Platform.OS == "ios" ? 40 : 0,
         padding: 20,
-        position: "relative"
+        position: "relative",
+        paddingTop: 0,
+        paddingBottom: 10
     },
     'top-bar': {},
     'question-title': {
         color: "#06D3F6",
-        fontSize: 20,
-        fontWeight: "700",
-        letterSpacing: .4
+        fontSize: 17,
+        // fontWeight: "600",
+        letterSpacing: .4,
+        // fontFamily: "jura"
     },
     'question-number': {
-        fontSize: 20
+        fontSize: 18
     },
     'quiz-type': {
-        color: colors.text.secondary,
-        fontSize: 20,
-        fontWeight: "500",
-        marginBottom: 10
+        color: "#FFD700",
+        fontSize: 15,
+        // fontWeight: "500",
+        marginBottom: 10,
+        // fontFamily: "jura"
     },
     'question-container': {
         flex: 1,
-        marginTop: 20,
+        marginTop: 15,
         alignItems: "flex-start",
         height: "100%",
     },
@@ -438,11 +526,14 @@ const styles = StyleSheet.create({
         // textShadowColor: 'rgba(255, 255, 255, 0.75)',
         // textShadowOffset: { width: -1, height: 1 },
         // textShadowRadius: 2,
-        fontSize: 25,
+        fontSize: 20,
         color: colors.text.primary,
         width: "100%",
         lineHeight: 30,
         minHeight: 100,
+        fontWeight: "500",
+        letterSpacing: .5,
+        // fontFamily: "jura"
     },
     answerContainer: {
         display: "flex",
@@ -454,7 +545,7 @@ const styles = StyleSheet.create({
     answerButton: {
         width: "100%",
         padding: 10,
-        borderWidth: 2,
+        borderWidth: 1,
         borderRadius: 30,
         height: 60,
         borderColor: "#fff",
@@ -465,12 +556,13 @@ const styles = StyleSheet.create({
         paddingRight: 10,
         alignItems: "center",
         marginBottom: 10,
+        color: colors.buttons.primary.background
         // marginBottom: 8
     },
     answerText: {
-        color: colors.text.primary,
+        // color: colors.buttons.primary.background,
         fontSize: 16,
-        // flexWrap: "wrap",
+        // fontFamily: "jura",
         fontWeight: '600',
         letterSpacing: 0.4,
         width: "80%",
@@ -480,7 +572,7 @@ const styles = StyleSheet.create({
         color: colors.buttons.primary.background,
         width: 30,
         height: 30,
-        borderWidth: 2,
+        borderWidth: 1,
         borderColor: colors.buttons.primary.background,
         borderRadius: 15,
         overflow: "hidden",
@@ -493,7 +585,7 @@ const styles = StyleSheet.create({
         color: colors.success,
         width: 30,
         height: 30,
-        borderWidth: 2,
+        borderWidth: 1,
         borderColor: "#fff",
         borderRadius: 15,
         overflow: "hidden"
@@ -502,13 +594,15 @@ const styles = StyleSheet.create({
         backgroundColor: colors.buttons.primary.background
     },
     selectedText: {
-        color: "#00DAFF",
+        // color: "#00DAFF",
         fontSize: 17,
-        fontWeight: "800"
+        fontWeight: "800",
+        // fontFamily: "jura"
     },
     correctAnswer: {
         backgroundColor: colors.text.primary,
-        color: colors.text.primary
+        color: colors.text.primary,
+        // fontFamily: "jura"
     },
     footer: {
         position: "absolute",
@@ -516,10 +610,14 @@ const styles = StyleSheet.create({
         height: "10%",
         width: "100%",
     },
-
+    'buttonContainer': {
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "space-between",
+    },
     next: {
         borderRadius: 30,
-        height: 60,
+        height: 50,
         borderWidth: 1,
         borderColor: colors.buttons.primary.background,
         backgroundColor: colors.buttons.primary.background,
@@ -527,21 +625,40 @@ const styles = StyleSheet.create({
         paddingLeft: 10,
         alignItems: "center",
         justifyContent: "center",
-        width: "100%"
+        width: "100%",
     },
     nextText: {
         color: colors.text.primary,
         fontSize: 20,
         letterSpacing: .4,
-        fontWeight: "700",
+        fontWeight: "400",
         width: 100,
-        textAlign: "center"
+        textAlign: "center",
+        // fontFamily: "jura"
+    },
+    quit: {
+        borderRadius: 30,
+        height: 50,
+        paddingRight: 10,
+        paddingLeft: 10,
+        alignItems: "center",
+        justifyContent: "center",
+        width: "100%",
+    },
+    'quit-text': {
+        color: "#909090",
+        fontSize: 20,
+        letterSpacing: .4,
+        fontWeight: "400",
+        // textAlign: "center",
+        width: 50,
+        // fontFamily: "jura"
     },
     'result-page': {
         flex: 1,
         alignItems: "center",
         padding: 10,
-        marginTop: 30,
+        // marginTop: 30,
     },
     'result-page-title': {
         color: colors.text.primary,
@@ -549,5 +666,47 @@ const styles = StyleSheet.create({
         letterSpacing: .4,
         fontWeight: "600",
         marginBottom: 20,
+        // fontFamily: "jura"
+    },
+    'card-container': {
+        // backgroundColor: "#00000079",
+        height: Platform.OS === "ios" ? 120 : 80,
+        width: "100%",
+        // marginBottom: 5,
+        paddingLeft: 10,
+        paddingRight: 10,
+        paddingTop: Platform.OS === "ios" ? 30 : 0,
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        borderBottomRightRadius: 20,
+        borderBottomLeftRadius: 20
+    },
+    'card-image': {
+        height: 54,
+        width: 54,
+        borderColor: colors.buttons.primary.background,
+        borderWidth: 2,
+        borderRadius: 50,
+        zIndex: 1
+    },
+    'card-name-text': {
+        backgroundColor: colors.buttons.primary.background,
+        color: colors.primary,
+        fontWeight: "600",
+        fontSize: 16,
+        letterSpacing: .5,
+        lineHeight: 30,
+        display: "flex",
+        paddingRight: 10,
+        paddingLeft: 40,
+        marginLeft: -25,
+        height: 40,
+        lineHeight: 40,
+        alignItems: "center",
+        borderRadius: Platform.OS === "ios" ? 20 : 50,
+        overflow: "hidden",
+        minWidth: Platform.OS === "ios" ? "20%" : "40%",
+        // fontFamily: "jura"
     }
 })

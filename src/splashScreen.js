@@ -1,3 +1,4 @@
+import { useFonts } from 'expo-font'
 import React, { useEffect, useState } from 'react'
 import { View, SafeAreaView, Image, ImageBackground, Text, StatusBar, Dimensions, Platform, StyleSheet } from 'react-native'
 import colors from '../theme/colors'
@@ -10,10 +11,10 @@ const SplashScreen = ({ navigation }) => {
             setTimeout(async () => {
                 const res = await getToken("quiz_app.user")
                 if (res) {
-                    navigation.navigate('quiz_comp')
+                    navigation.navigate('confirmation')
                 }
                 else {
-                    navigation.navigate("quiz_comp")
+                    navigation.navigate("login")
                 }
                 setIsOpen(false)
             }, 5000)

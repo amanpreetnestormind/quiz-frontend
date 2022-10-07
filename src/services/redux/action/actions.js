@@ -23,15 +23,16 @@ export const getQuestion = () => dispatch => {
 }
 
 export const userRegisterAndLogin = (userData, navigate) => dispatch => {
+    console.log(userData, "User Data");
     api.post('user', userData)
         .then(res => {
-            console.log(res, "response");
+            console.log(userData, "User data");
             dispatch({
                 type: UESR_REGISTER_AND_LOGIN,
                 payload: res
             })
             saveToken('quiz_app.user', res)
-            navigate('quiz_comp')
+            navigate('confirmation')
         })
         .catch(err => {
             console.log(err, 'error');

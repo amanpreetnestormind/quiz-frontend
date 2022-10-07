@@ -1,25 +1,30 @@
 import { NavigationContainer } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import React from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { Text, View } from 'react-native'
 import { Provider } from 'react-redux'
 import Login from './src/screen/auth'
-import Quiz_Page from './src/screen/quiz'
+import Confirmation from './src/screen/auth/confirmation'
 import Quiz_comp from './src/screen/quiz_comp'
 import Store from './src/services/redux/store/store'
-import SplashScreen from './src/splashScreen'
+import SplashScreen1 from './src/splashScreen'
+import { useFonts } from 'expo-font'
+import { AppLoading } from 'expo';
 
 const App = () => {
   const Stack = createNativeStackNavigator()
   return (
     <Provider store={Store}>
       <NavigationContainer>
-        <Stack.Navigator headerMode="none" initialRouteName='splash-screen' screenOptions={{
-          headerShown: false,
-        }}>
+        <Stack.Navigator
+          headerMode="none"
+          initialRouteName='splash-screen'
+          screenOptions={{
+            headerShown: false,
+          }}>
           <Stack.Screen
             name='splash-screen'
-            component={SplashScreen}
+            component={SplashScreen1}
             options={{
               headerTransparent: false,
               headerTitle: () => null,
@@ -54,6 +59,26 @@ const App = () => {
               // header: () => null,
             }}
           />
+
+          <Stack.Screen
+            name='confirmation'
+            component={Confirmation}
+            options={{
+              headerTitle: () => <View style={{
+                display: "flex",
+                justifyContent: "center",
+              }}
+              >
+                <Text>Quiz</Text>
+              </View>,
+              headerShown: () => null,
+              headerTransparent: true,
+              headerTitle: () => null,
+              headerShown: false,
+              // header: () => null,
+            }}
+          />
+
         </Stack.Navigator>
       </NavigationContainer>
     </Provider>

@@ -1,12 +1,13 @@
 import axios from 'axios'
-import { PORT, NODE_ENV, REACT_APP_API_URL } from '@env'
+// import { PORT, NODE_ENV, REACT_APP_API_URL } from '@env'
 /**
  * @description this file is for Axios Interceptor
  */
 
+console.log(process.env.REACT_APP_API_URL,process.env.REACT_APP_FACEBOOK_ID);
 const api = axios.create({
     // baseURL: NODE_ENV == 'development' ? `http://localhost:${PORT}/api/v1/` : `https://<domain_name>.com/api/v1/`,
-    baseURL: REACT_APP_API_URL,
+    baseURL: "https://protected-gorge-56773.herokuapp.com/api/v1/",
 })
 
 // Request Interceptor

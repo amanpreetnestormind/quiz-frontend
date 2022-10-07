@@ -3,12 +3,12 @@ import { Alert, Image, ImageBackground, Platform, SafeAreaView, StatusBar, Style
 import { Entypo, AntDesign, FontAwesome } from '@expo/vector-icons'
 import * as Facebook from 'expo-facebook';
 import axios from 'axios';
-import { REACT_APP_FACEBOOK_ID } from '@env'
 import { useDispatch } from 'react-redux';
 import { userRegisterAndLogin } from '../../services/redux/action/actions';
 import colors from '../../../theme/colors';
 import { SvgUri, SvgXml } from 'react-native-svg';
 import SVGFacebook from '../../../assets/facebook.svg'
+import FacebookIcon from '../../components/Icons/facebook_icon';
 
 // import { initializeApp } from 'firebase/app';
 // import {
@@ -86,12 +86,22 @@ const Login = ({ navigation }) => {
       resizeMode: "cover"
     }} />
     <View style={styles.footer}>
+      <Text style={{
+        color: "#fff",
+        fontSize: 20,
+        letterSpacing: .4,
+        lineHeight: 30,
+        fontWeight: "400",
+        minWidth: 250,
+        textAlign: "center",
+        marginBottom: 10
+      }}>Sign Up With</Text>
       <View style={styles['button-main-container']}>
         <TouchableOpacity style={styles['button-container']}
           onPress={async () => {
             try {
               await Facebook.initializeAsync({
-                appId: REACT_APP_FACEBOOK_ID
+                appId: 504762654377990
               });
               const { type, token, expirationDate, permissions, declinedPermissions } = await Facebook.logInWithReadPermissionsAsync({ permissions: ['public_profile'] });
               if (type === 'success') {
@@ -108,30 +118,38 @@ const Login = ({ navigation }) => {
                     facebookId: response.data.id,
                     userEmail: response.data.email,
                     userName: response.data.name,
-                    googleId: ""
+                    googleId: "",
+                    ...response.data
                   }, navigation.navigate))
 
                 }).catch(err => {
-                  console.log(err, REACT_APP_FACEBOOK_ID, "REACT_APP_FACEBOOK_ID");
+                  console.log(err, 504762654377990, "504762654377990");
                 });
               } else {
                 // type === 'cancel'
-                console.log(REACT_APP_FACEBOOK_ID, "REACT_APP_FACEBOOK_ID");
+                console.log(504762654377990, "504762654377990");
               }
             } catch ({ message }) {
               alert(`Facebook Login Error: ${message}`);
             }
           }}>
-          <Entypo name="facebook" style={styles['icon-style']} />
-          {/* <Image source={require('../../../assets/facebook.svg')} style={{
-            backgroundColor: "#fff"
-          }} /> */}
+          {/* <Entypo name="facebook" style={styles['icon-style']} /> */}
+          <Image source={require('../../../assets/images/facebook.png')} style={{
+            backgroundColor: "transparent",
+            height: "80%",
+            width: "80%"
+          }} />
         </TouchableOpacity>
         {/* <Text style={styles['button-text']}>
             Login with Facebook</Text> */}
 
         <TouchableOpacity style={styles['button-container']}>
-          <FontAwesome name="google-plus-square" style={styles['icon-style']} />
+          {/* <FontAwesome name="google-plus-square" style={styles['icon-style']} /> */}
+          <Image source={require('../../../assets/images/google.png')} style={{
+            backgroundColor: "transparent",
+            height: "80%",
+            width: "80%"
+          }} />
         </TouchableOpacity>
         {/* <Text style={styles['button-text']}>
             Login with Google</Text> */}
@@ -141,7 +159,7 @@ const Login = ({ navigation }) => {
 }
 
 export default Login
-// primary "#0E346D"
+
 const styles = StyleSheet.create({
   'main-container': {
     flex: 1,
@@ -155,26 +173,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     display: "flex",
-    flexDirection: "row",
-    // marginTop: Platform.OS == "ios" ? 20 : 0,
-    // flex: 1,
+    flexDirection: "row"
   },
   "button-container": {
-    // paddingRight: 20,
-    // paddingLeft: 20,
-    // paddingTop: 5,
-    // paddingBottom: 5,
-    // borderRadius: 50,
-    // backgroundColor: "#fff",
-    // borderRadius: 50,
-    // flexDirection: "row",
-    // justifyContent: "space-evenly",
-    // alignItems: "center",
-    // width: "80%",
-    // position: "relative",
-    // borderWidth: 1,
-    // marginBottom: 20
-    margin: 6
+    margin: 6,
+    width: 60,
+    height: 60,
+    borderWidth: 1,
+    borderColor: "#06D3F6",
+    borderRadius: 8,
+    padding: 5,
+    justifyContent: "center",
+    alignItems: "center"
 
   },
   "button-text": {
