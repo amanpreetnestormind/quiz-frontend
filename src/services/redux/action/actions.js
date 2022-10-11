@@ -22,7 +22,7 @@ export const getQuestion = () => dispatch => {
         })
 }
 
-export const userRegisterAndLogin = (userData, navigate) => dispatch => {
+export const userRegisterAndLogin = (userData, navigate, setIsFacebookLoading) => dispatch => {
     api.post('user', userData)
         .then(res => {
             console.log(userData, "User data");
@@ -30,6 +30,7 @@ export const userRegisterAndLogin = (userData, navigate) => dispatch => {
                 type: UESR_REGISTER_AND_LOGIN,
                 payload: res
             })
+            setIsFacebookLoading(false)
             saveToken('quiz_app.user', res)
             navigate('confirmation')
         })

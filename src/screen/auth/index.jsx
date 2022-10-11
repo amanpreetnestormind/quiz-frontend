@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Alert, Image, ImageBackground, Platform, SafeAreaView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { ActivityIndicator, Alert, Image, ImageBackground, Platform, SafeAreaView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { Entypo, AntDesign, FontAwesome } from '@expo/vector-icons'
 import * as Facebook from 'expo-facebook';
 import axios from 'axios';
@@ -46,6 +46,7 @@ const Login = ({ navigation }) => {
     "userName": "Preet Singh"
   })
   const dispatch = useDispatch()
+  const [isFacebookLoading, setIsFacebookLoading] = useState(false)
   // const signIn = async () => {
   //     try {
   //         await GoogleSignin.hasPlayServices({ autoResolve: true, showPlayServicesUpdateDialog: true });
@@ -101,6 +102,7 @@ const Login = ({ navigation }) => {
         <TouchableOpacity style={styles['button-container']}
           onPress={async () => {
             try {
+              setIsFacebookLoading(true)
               await Facebook.initializeAsync({
                 appId: REACT_APP_FACEBOOK_ID
               });
@@ -114,14 +116,13 @@ const Login = ({ navigation }) => {
                     userEmail: response.data.email,
                     userName: response.data.name
                   })
-                  // console.log(response);
                   dispatch(userRegisterAndLogin({
                     facebookId: response.data.id,
                     userEmail: response.data.email,
                     userName: response.data.name,
                     googleId: "",
                     ...response.data
-                  }, navigation.navigate))
+                  }, navigation.navigate,setIsFacebookLoading))
 
                 }).catch(err => {
                   console.log(err, REACT_APP_FACEBOOK_ID, "REACT_APP_FACEBOOK_ID");
@@ -134,12 +135,13 @@ const Login = ({ navigation }) => {
               alert(`Facebook Login Error: ${message}`);
             }
           }}>
-          {/* <Entypo name="facebook" style={styles['icon-style']} /> */}
-          <Image source={require('../../../assets/images/facebook.png')} style={{
+          {!isFacebookLoading && <Image source={require('../../../assets/images/facebook.png')} style={{
             backgroundColor: "transparent",
             height: "80%",
             width: "80%"
-          }} />
+          }} />}
+          {isFacebookLoading && <ActivityIndicator color={colors.buttons.primary.background} size="large" />}
+
         </TouchableOpacity>
         {/* <Text style={styles['button-text']}>
             Login with Facebook</Text> */}

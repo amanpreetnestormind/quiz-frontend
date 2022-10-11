@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Quiz-app",
-    "slug": "Quiz-app",
+    "name": "Animals-Quiz-App",
+    "slug": "animals-quiz-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Text, View, ActivityIndicator, Animated, Image, ImageBackground, Platform, StatusBar, StyleSheet, TouchableOpacity, TouchableWithoutFeedback } from "react-native"
+import { Text, View, ActivityIndicator, Animated, Image, ImageBackground, Platform, StatusBar, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, Alert } from "react-native"
 import { useDispatch, useSelector } from "react-redux"
 import colors from "../../theme/colors"
 import { getToken, removeItemValue, replaceString } from '../services/common_functions'
@@ -8,8 +8,19 @@ import { AntDesign } from '@expo/vector-icons'
 import { BackHandler } from 'react-native'
 import useAuth from '../hooks/useAuth'
 import * as Font from 'expo-font'
-const Quiz_comp = ({ navigation }) => {
 
+const Quiz_comp = ({ navigation }) => {
+    const [isSignedIn, isLoginUser, isLogoutUser] = useAuth()
+
+    const confirmationModal = () =>
+        Alert.alert('Warning', 'Are you sure, You want to logout ?', [
+            {
+                text: 'Deny',
+                onPress: () => console.log('Deny Pressed'),
+                style: 'Deny',
+            },
+            { text: 'Allow', onPress: () => isLogoutUser() },
+        ]);
     const LoadFonts = async () => {
         await Font.loadAsync({
             Jura: require('../../assets/fonts/Jura-VariableFont_wght.ttf')
@@ -20,7 +31,6 @@ const Quiz_comp = ({ navigation }) => {
         LoadFonts()
     }, [])
 
-    const [isSignedIn, isLoginUser, isLogoutUser] = useAuth()
     const [animationState, setAnimationState] = useState({
         ready: false,
         SlideInLeft: new Animated.Value(0),
@@ -174,12 +184,6 @@ const Quiz_comp = ({ navigation }) => {
                             isBlinking && styles.textGlowing
                         ]}>{replaceString(question?.question)}</Text>
                         <View style={styles.answerContainer}>
-                            {/* <Text style={{
-                                    color: "#fff"
-                                }}>
-                                    {question.correct_answer}
-                                    {correctAnswerCount}
-                                </Text> */}
                             {question.incorrect_answers?.map((ans, i) => (<AnimatedClick
                                 disabled={answerSubmit}
                                 key={i}
@@ -237,14 +241,10 @@ const Quiz_comp = ({ navigation }) => {
                                         textAlign: "center"
                                     }
                                 ]}>
-                                    {/* {selectedIndex === i && <AntDesign style={{
+                                    {selectedIndex === i && <AntDesign style={{
                                         alignSelf: "center"
 
-                                    }} name="check" size={18} color={output.wrongAnswer ? "red" : "#fff"} />} */}
-                                    <AntDesign style={{
-                                        alignSelf: "center"
-
-                                    }} name="check" size={18} color={output.wrongAnswer ? "red" : "#fff"} />
+                                    }} name="check" size={18} color={output.wrongAnswer ? "red" : "#fff"} />}
                                 </Text>
                             </AnimatedClick>))}
                         </View>
@@ -267,7 +267,7 @@ const Quiz_comp = ({ navigation }) => {
                                 display: currentIndex > 10 ? "none" : "flex",
                             }}
                             onPress={() => {
-                                removeItemValue('quiz_app.user', navigation.navigate)
+                                confirmationModal()
                             }}>
                             <View style={{
                                 display: "flex",
@@ -369,7 +369,8 @@ const Quiz_comp = ({ navigation }) => {
                         fontWeight: "bold",
                         marginTop: 10,
                         minWidth: 250,
-                        textAlign: "center"
+                        textAlign: "center",
+                        fontFamily: "Jura"
                     }
                 ]}>Congratulation!</Text>
                 <Text style={[
@@ -433,9 +434,8 @@ const Quiz_comp = ({ navigation }) => {
                             ...styles.quit,
                             display: currentIndex <= 10 ? "none" : "flex",
                         }}
-                        disabled={isNext}
                         onPress={() => {
-                            BackHandler.exitApp()
+                            confirmationModal()
                         }}>
                         <View style={{
                             display: "flex",
@@ -486,7 +486,8 @@ const Quiz_comp = ({ navigation }) => {
                             textTransform: "uppercase",
                             textAlign: "center",
                             justifyContent: "center",
-                            alignItems: "center"
+                            alignItems: "center",
+                            fontFamily: "Jura"
                         }}>Start Again</Text>
                     </TouchableOpacity>
                 </View>

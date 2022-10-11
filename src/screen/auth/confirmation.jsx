@@ -3,10 +3,30 @@ import { Platform } from 'react-native'
 import { Image, ImageBackground, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import colors from '../../../theme/colors'
 import useAuth from '../../hooks/useAuth'
-// const jwt=require('jsonwebtoken')
+import * as Font from 'expo-font'
+import { Alert } from 'react-native'
 
 const Confirmation = ({ navigation: { navigate } }) => {
     const [isSignedIn, loginUser, logoutUser] = useAuth()
+
+    const LoadFont = async () => {
+        await Font.loadAsync({
+            "Jura": require('../../../assets/fonts/Jura-VariableFont_wght.ttf')
+        })
+    }
+    const confirmationModal = () =>
+        Alert.alert('Warning', 'Are you sure, You want to logout ?', [
+            {
+                text: 'Cancel',
+                onPress: () => console.log('Cancel Pressed'),
+                style: 'Deny',
+            },
+            { text: 'Allow', onPress: () => logoutUser() },
+        ]);
+
+    useEffect(() => {
+        LoadFont()
+    }, [])
 
     return (<View style={{ flex: 1 }}>
         <ImageBackground
@@ -30,7 +50,7 @@ const Confirmation = ({ navigation: { navigate } }) => {
                 <View style={[styles['button-container']]}>
                     <TouchableOpacity style={[styles['cancel-button']]}
                         onPress={() => {
-                            // logoutUser()
+                            confirmationModal()
                         }}>
                         <View style={{
                             display: "flex",
