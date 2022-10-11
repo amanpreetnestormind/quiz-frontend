@@ -6,9 +6,21 @@ import { getToken, removeItemValue, replaceString } from '../services/common_fun
 import { getQuestion } from '../services/redux/action/actions'
 import { AntDesign } from '@expo/vector-icons'
 import { BackHandler } from 'react-native'
-
+import useAuth from '../hooks/useAuth'
+import * as Font from 'expo-font'
 const Quiz_comp = ({ navigation }) => {
 
+    const LoadFonts = async () => {
+        await Font.loadAsync({
+            Jura: require('../../assets/fonts/Jura-VariableFont_wght.ttf')
+        })
+    };
+
+    useEffect(() => {
+        LoadFonts()
+    }, [])
+
+    const [isSignedIn, isLoginUser, isLogoutUser] = useAuth()
     const [animationState, setAnimationState] = useState({
         ready: false,
         SlideInLeft: new Animated.Value(0),
@@ -41,14 +53,7 @@ const Quiz_comp = ({ navigation }) => {
     const [blinkingInterval, setBlinkingInterval] = useState(false);
     const [correctAnswerCount, setCorrectAnswerCount] = useState(0)
 
-    const getUser = async () => {
-        const user = await getToken("quiz_app.user")
-        setLoginUser(user)
-        return user
-    }
-
     useEffect(() => {
-        getUser()
         dispatch(getQuestion())
 
         if (!blinkingInterval) {
@@ -64,7 +69,6 @@ const Quiz_comp = ({ navigation }) => {
     }, [])
 
     useEffect(() => {
-        getUser()
         setTotalCount(selector?.reducer?.question?.results?.length)
         setQuestions(selector?.reducer?.question?.results)
     }, [selector])
@@ -113,12 +117,16 @@ const Quiz_comp = ({ navigation }) => {
                     styles['card-container']
                 ]}>
                 <Image
+                    source={isSignedIn?.data?.picture?.data?.url ? { uri: isSignedIn?.data?.picture?.data?.url } : require("../../assets/robinCartoon.png")}
+                    style={[styles['card-image']]} />
+                <Text style={[styles['card-name-text']]}>{isSignedIn?.data?.userName}</Text>
+                {/* <Image
                     source={require('../../assets/robinCartoon.png')}
                     style={[
                         styles['card-image']
                     ]} />
                 <Text
-                    style={[styles['card-name-text']]}>Robin Sharma</Text>
+                    style={[styles['card-name-text']]}>Robin Sharma</Text> */}
             </View>
         </View>
         {!isLoading && currentIndex <= 10 && <View style={[
@@ -233,10 +241,10 @@ const Quiz_comp = ({ navigation }) => {
                                         alignSelf: "center"
 
                                     }} name="check" size={18} color={output.wrongAnswer ? "red" : "#fff"} />} */}
-                                    {/* <AntDesign style={{
+                                    <AntDesign style={{
                                         alignSelf: "center"
 
-                                    }} name="check" size={18} color={output.wrongAnswer ? "red" : "#fff"} /> */}
+                                    }} name="check" size={18} color={output.wrongAnswer ? "red" : "#fff"} />
                                 </Text>
                             </AnimatedClick>))}
                         </View>
@@ -504,7 +512,7 @@ const styles = StyleSheet.create({
         fontSize: 17,
         // fontWeight: "600",
         letterSpacing: .4,
-        // fontFamily: "jura"
+        fontFamily: "Jura"
     },
     'question-number': {
         fontSize: 18
@@ -514,7 +522,7 @@ const styles = StyleSheet.create({
         fontSize: 15,
         // fontWeight: "500",
         marginBottom: 10,
-        // fontFamily: "jura"
+        fontFamily: "Jura"
     },
     'question-container': {
         flex: 1,
@@ -533,7 +541,7 @@ const styles = StyleSheet.create({
         minHeight: 100,
         fontWeight: "500",
         letterSpacing: .5,
-        // fontFamily: "jura"
+        fontFamily: "Jura"
     },
     answerContainer: {
         display: "flex",
@@ -562,7 +570,7 @@ const styles = StyleSheet.create({
     answerText: {
         // color: colors.buttons.primary.background,
         fontSize: 16,
-        // fontFamily: "jura",
+        fontFamily: "Jura",
         fontWeight: '600',
         letterSpacing: 0.4,
         width: "80%",
@@ -597,12 +605,12 @@ const styles = StyleSheet.create({
         // color: "#00DAFF",
         fontSize: 17,
         fontWeight: "800",
-        // fontFamily: "jura"
+        fontFamily: "Jura"
     },
     correctAnswer: {
         backgroundColor: colors.text.primary,
         color: colors.text.primary,
-        // fontFamily: "jura"
+        fontFamily: "Jura"
     },
     footer: {
         position: "absolute",
@@ -634,7 +642,7 @@ const styles = StyleSheet.create({
         fontWeight: "400",
         width: 100,
         textAlign: "center",
-        // fontFamily: "jura"
+        fontFamily: "Jura"
     },
     quit: {
         borderRadius: 30,
@@ -652,7 +660,7 @@ const styles = StyleSheet.create({
         fontWeight: "400",
         // textAlign: "center",
         width: 50,
-        // fontFamily: "jura"
+        fontFamily: "Jura"
     },
     'result-page': {
         flex: 1,
@@ -666,14 +674,14 @@ const styles = StyleSheet.create({
         letterSpacing: .4,
         fontWeight: "600",
         marginBottom: 20,
-        // fontFamily: "jura"
+        fontFamily: "Jura"
     },
     'card-container': {
         // backgroundColor: "#00000079",
         height: Platform.OS === "ios" ? 120 : 80,
         width: "100%",
         // marginBottom: 5,
-        paddingLeft: 10,
+        paddingLeft: 0,
         paddingRight: 10,
         paddingTop: Platform.OS === "ios" ? 30 : 0,
         display: "flex",
@@ -707,6 +715,6 @@ const styles = StyleSheet.create({
         borderRadius: Platform.OS === "ios" ? 20 : 50,
         overflow: "hidden",
         minWidth: Platform.OS === "ios" ? "20%" : "40%",
-        // fontFamily: "jura"
+        fontFamily: "Jura"
     }
 })

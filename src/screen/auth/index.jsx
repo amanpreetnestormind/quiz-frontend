@@ -9,6 +9,7 @@ import colors from '../../../theme/colors';
 import { SvgUri, SvgXml } from 'react-native-svg';
 import SVGFacebook from '../../../assets/facebook.svg'
 import FacebookIcon from '../../components/Icons/facebook_icon';
+import { REACT_APP_FACEBOOK_ID } from '@env'
 
 // import { initializeApp } from 'firebase/app';
 // import {
@@ -101,7 +102,7 @@ const Login = ({ navigation }) => {
           onPress={async () => {
             try {
               await Facebook.initializeAsync({
-                appId: 504762654377990
+                appId: REACT_APP_FACEBOOK_ID
               });
               const { type, token, expirationDate, permissions, declinedPermissions } = await Facebook.logInWithReadPermissionsAsync({ permissions: ['public_profile'] });
               if (type === 'success') {
@@ -123,11 +124,11 @@ const Login = ({ navigation }) => {
                   }, navigation.navigate))
 
                 }).catch(err => {
-                  console.log(err, 504762654377990, "504762654377990");
+                  console.log(err, REACT_APP_FACEBOOK_ID, "REACT_APP_FACEBOOK_ID");
                 });
               } else {
                 // type === 'cancel'
-                console.log(504762654377990, "504762654377990");
+                console.log(REACT_APP_FACEBOOK_ID, "REACT_APP_FACEBOOK_ID");
               }
             } catch ({ message }) {
               alert(`Facebook Login Error: ${message}`);

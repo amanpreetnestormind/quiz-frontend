@@ -23,7 +23,6 @@ export const getQuestion = () => dispatch => {
 }
 
 export const userRegisterAndLogin = (userData, navigate) => dispatch => {
-    console.log(userData, "User Data");
     api.post('user', userData)
         .then(res => {
             console.log(userData, "User data");

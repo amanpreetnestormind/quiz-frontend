@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { getToken, removeItemValue } from '../services/common_functions'
+import jwtDecode from 'jwt-decode'
 
 const useAuth = () => {
 
@@ -19,6 +20,7 @@ const useAuth = () => {
 
     useEffect(() => {
         getUser()
+        // console.log(jwtDecode(signInUser?.data?.token||""));
     }, [])
 
     return [signInUser, getUser, logoutUser]

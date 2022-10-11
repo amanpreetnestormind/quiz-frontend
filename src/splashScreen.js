@@ -1,11 +1,22 @@
-import { useFonts } from 'expo-font'
 import React, { useEffect, useState } from 'react'
 import { View, SafeAreaView, Image, ImageBackground, Text, StatusBar, Dimensions, Platform, StyleSheet } from 'react-native'
 import colors from '../theme/colors'
 import { getToken } from './services/common_functions'
+// import * as Font from 'expo-font'
 
 const SplashScreen = ({ navigation }) => {
     const [isOpen, setIsOpen] = useState(true)
+
+    // const LoadFonts = async () => {
+    //     await Font.loadAsync({
+    //         Jura: require('../assets/fonts/Jura-VariableFont_wght.ttf')
+    //     })
+    // };
+
+    // useEffect(() => {
+    //     LoadFonts()
+    // }, [])
+
     useEffect(() => {
         if (isOpen) {
             setTimeout(async () => {
@@ -141,7 +152,8 @@ const styles = StyleSheet.create({
     },
     'footer-inner': {
         color: colors.text.primary,
-        fontSize: 13,
+        fontSize: 14,
         letterSpacing: .5,
+        // fontFamily: 'Jura'
     }
 })

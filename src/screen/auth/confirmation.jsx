@@ -3,10 +3,10 @@ import { Platform } from 'react-native'
 import { Image, ImageBackground, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import colors from '../../../theme/colors'
 import useAuth from '../../hooks/useAuth'
+// const jwt=require('jsonwebtoken')
 
 const Confirmation = ({ navigation: { navigate } }) => {
-    // const [isSignedIn, loginUser, logoutUser] = useAuth()
-    // console.log(isSignedIn);
+    const [isSignedIn, loginUser, logoutUser] = useAuth()
 
     return (<View style={{ flex: 1 }}>
         <ImageBackground
@@ -16,8 +16,9 @@ const Confirmation = ({ navigation: { navigate } }) => {
                 <View style={[
                     styles['image-container']
                 ]}>
-                    <Image source={require("../../../assets/robinCartoon.png")} style={[styles.image]} />
-                    <Text style={[styles['profile-name']]}>Robin Sharma</Text>
+                    {/* {console.log(isSignedIn?.data?.picture?.data?.url)} */}
+                    <Image source={isSignedIn?.data?.picture?.data?.url ? { uri: isSignedIn?.data?.picture?.data?.url } : require("../../../assets/robinCartoon.png")} style={[styles.image]} />
+                    <Text style={[styles['profile-name']]}>{isSignedIn?.data?.userName}</Text>
                 </View>
                 <View style={[styles['text-container']]}>
                     <Text style={[styles['welcome-text']]}>
@@ -83,7 +84,7 @@ const styles = StyleSheet.create({
     'welcome-text': {
         textAlign: "center",
         color: colors.text.primary,
-        // fontFamily: "Jura",
+        fontFamily: "Jura",
         fontSize: 15,
         fontWeight: "500",
         letterSpacing: .4,
@@ -93,16 +94,16 @@ const styles = StyleSheet.create({
         color: colors.text.primary,
         fontSize: 20,
         fontWeight: Platform.OS == "ios" ? '600' : "600",
-        // fontFamily: "Jura",
+        fontFamily: "Jura",
         marginTop: 10,
         minWidth: 200,
         textAlign: "center",
         letterSpacing: .4,
-        lineHeight:30
+        lineHeight: 30
     },
     image: {
         width: Platform.OS == "android" ? "50%" : "50%",
-        height: Platform.OS == "android" ? "65%" : "50%",
+        height: Platform.OS == "android" ? "65%" : "53%",
         borderRadius: Platform.OS == "android" ? 100 : 300,
         overflow: "hidden"
     },
@@ -137,12 +138,12 @@ const styles = StyleSheet.create({
         letterSpacing: .4,
         width: 200,
         textAlign: "center",
-        // fontFamily: "Jura"
-        fontWeight:"500"
+        fontFamily: "Jura",
+        fontWeight: "500"
     },
     'cancel-text': {
         textAlign: "center",
-        // fontFamily: "Jura",
+        fontFamily: "Jura",
         color: "#909090",
         fontSize: 18,
         letterSpacing: .4,
