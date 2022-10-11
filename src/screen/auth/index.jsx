@@ -84,9 +84,11 @@ const Login = ({ navigation }) => {
       </View>
     </View> */}
 
-    <Image source={require('../../../assets/images/logo.png')} style={{
-      resizeMode: "cover"
-    }} />
+    <Image
+      source={require('../../../assets/images/logo.png')}
+      style={{
+        resizeMode: "cover"
+      }} />
     <View style={styles.footer}>
       <Text style={{
         color: "#fff",
@@ -96,7 +98,8 @@ const Login = ({ navigation }) => {
         fontWeight: "400",
         minWidth: 250,
         textAlign: "center",
-        marginBottom: 10
+        marginBottom: 10,
+        fontFamily: "Poppins"
       }}>Sign Up With</Text>
       <View style={styles['button-main-container']}>
         <TouchableOpacity style={styles['button-container']}
@@ -109,7 +112,7 @@ const Login = ({ navigation }) => {
               const { type, token, expirationDate, permissions, declinedPermissions } = await Facebook.logInWithReadPermissionsAsync({ permissions: ['public_profile'] });
               if (type === 'success') {
                 // Get the user's name using Facebook's Graph API
-                axios.get(`https://graph.facebook.com/me?access_token=${token}&fields=id,name,email,about,picture`).then(response => {
+                axios.get(`https://graph.facebook.com/me?access_token=${token}&fields=id,name,email,about,picture.type(large)`).then(response => {
                   setUserData({
                     ...userData,
                     facebookId: response.data.id,
@@ -122,7 +125,7 @@ const Login = ({ navigation }) => {
                     userName: response.data.name,
                     googleId: "",
                     ...response.data
-                  }, navigation.navigate,setIsFacebookLoading))
+                  }, navigation.navigate, setIsFacebookLoading))
 
                 }).catch(err => {
                   console.log(err, REACT_APP_FACEBOOK_ID, "REACT_APP_FACEBOOK_ID");

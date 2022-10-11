@@ -9,13 +9,16 @@ import Quiz_comp from './src/screen/quiz_comp'
 import Store from './src/services/redux/store/store'
 import SplashScreen1 from './src/splashScreen'
 import * as Font from 'expo-font'
+import useAuth from './src/hooks/useAuth'
+import { Platform } from 'react-native'
 
 const App = () => {
+  const [isSignedIn, isLoginUser, logoutUser] = useAuth()
   const Stack = createNativeStackNavigator()
-
+  
   const LoadFonts = async () => {
     await Font.loadAsync({
-      "Jura": require('./assets/fonts/Jura-VariableFont_wght.ttf')
+      "Poppins": require("./assets/fonts/Poppins-Medium.ttf")
     })
   };
 

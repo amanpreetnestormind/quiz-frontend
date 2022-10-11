@@ -10,7 +10,7 @@ import useAuth from '../hooks/useAuth'
 import * as Font from 'expo-font'
 
 const Quiz_comp = ({ navigation }) => {
-    const [isSignedIn, isLoginUser, isLogoutUser] = useAuth()
+    const [isSignedIn, isLoginUser, logoutUser] = useAuth()
 
     const confirmationModal = () =>
         Alert.alert('Warning', 'Are you sure, You want to logout ?', [
@@ -19,14 +19,25 @@ const Quiz_comp = ({ navigation }) => {
                 onPress: () => console.log('Deny Pressed'),
                 style: 'Deny',
             },
-            { text: 'Allow', onPress: () => isLogoutUser() },
+            {
+                text: 'Allow', onPress: () => {
+                    logoutUser()
+                }
+            },
         ]);
+
+    // const LoadFonts = async () => {
+    //     await Font.loadAsync({
+    //         "Jura": require('../../assets/fonts/Jura-VariableFont_wght.ttf')
+    //     })
+    // };
+
     const LoadFonts = async () => {
         await Font.loadAsync({
-            Jura: require('../../assets/fonts/Jura-VariableFont_wght.ttf')
+            "Poppins": require("../../assets/fonts/Poppins-Medium.ttf")
+            // "Poppins": { uri: "https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" }
         })
     };
-
     useEffect(() => {
         LoadFonts()
     }, [])
@@ -370,7 +381,7 @@ const Quiz_comp = ({ navigation }) => {
                         marginTop: 10,
                         minWidth: 250,
                         textAlign: "center",
-                        fontFamily: "Jura"
+                        fontFamily: "Poppins"
                     }
                 ]}>Congratulation!</Text>
                 <Text style={[
@@ -480,14 +491,14 @@ const Quiz_comp = ({ navigation }) => {
                         <Text style={{
                             // ...styles.nextText,
                             color: colors.text.primary,
-                            fontWeight: "700",
+                            // fontWeight: "700",
                             fontSize: 20,
                             minWidth: 200,
                             textTransform: "uppercase",
                             textAlign: "center",
                             justifyContent: "center",
                             alignItems: "center",
-                            fontFamily: "Jura"
+                            fontFamily: "Poppins"
                         }}>Start Again</Text>
                     </TouchableOpacity>
                 </View>
@@ -513,7 +524,7 @@ const styles = StyleSheet.create({
         fontSize: 17,
         // fontWeight: "600",
         letterSpacing: .4,
-        fontFamily: "Jura"
+        fontFamily: "Poppins"
     },
     'question-number': {
         fontSize: 18
@@ -523,7 +534,7 @@ const styles = StyleSheet.create({
         fontSize: 15,
         // fontWeight: "500",
         marginBottom: 10,
-        fontFamily: "Jura"
+        fontFamily: "Poppins"
     },
     'question-container': {
         flex: 1,
@@ -540,9 +551,9 @@ const styles = StyleSheet.create({
         width: "100%",
         lineHeight: 30,
         minHeight: 100,
-        fontWeight: "500",
+        // fontWeight: "800",
         letterSpacing: .5,
-        fontFamily: "Jura"
+        fontFamily: "Poppins"
     },
     answerContainer: {
         display: "flex",
@@ -571,7 +582,7 @@ const styles = StyleSheet.create({
     answerText: {
         // color: colors.buttons.primary.background,
         fontSize: 16,
-        fontFamily: "Jura",
+        fontFamily: "Poppins",
         fontWeight: '600',
         letterSpacing: 0.4,
         width: "80%",
@@ -606,12 +617,12 @@ const styles = StyleSheet.create({
         // color: "#00DAFF",
         fontSize: 17,
         fontWeight: "800",
-        fontFamily: "Jura"
+        fontFamily: "Poppins"
     },
     correctAnswer: {
         backgroundColor: colors.text.primary,
         color: colors.text.primary,
-        fontFamily: "Jura"
+        fontFamily: "Poppins"
     },
     footer: {
         position: "absolute",
@@ -643,7 +654,7 @@ const styles = StyleSheet.create({
         fontWeight: "400",
         width: 100,
         textAlign: "center",
-        fontFamily: "Jura"
+        fontFamily: "Poppins"
     },
     quit: {
         borderRadius: 30,
@@ -661,7 +672,7 @@ const styles = StyleSheet.create({
         fontWeight: "400",
         // textAlign: "center",
         width: 50,
-        fontFamily: "Jura"
+        fontFamily: "Poppins"
     },
     'result-page': {
         flex: 1,
@@ -675,7 +686,7 @@ const styles = StyleSheet.create({
         letterSpacing: .4,
         fontWeight: "600",
         marginBottom: 20,
-        fontFamily: "Jura"
+        fontFamily: "Poppins"
     },
     'card-container': {
         // backgroundColor: "#00000079",
@@ -716,6 +727,6 @@ const styles = StyleSheet.create({
         borderRadius: Platform.OS === "ios" ? 20 : 50,
         overflow: "hidden",
         minWidth: Platform.OS === "ios" ? "20%" : "40%",
-        fontFamily: "Jura"
+        fontFamily: "Poppins"
     }
 })

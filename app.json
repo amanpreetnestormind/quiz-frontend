@@ -27,7 +27,7 @@
       "supportsTablet": true
     },
     "android": {
-      "package": "quiz_native.app",
+      "package": "com.amanpreet_singh.quizapp",
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#FFFFFF"
