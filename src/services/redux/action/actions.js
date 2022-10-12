@@ -35,6 +35,7 @@ export const userRegisterAndLogin = (userData, navigate, setIsFacebookLoading) =
             navigate('confirmation')
         })
         .catch(err => {
+            setIsFacebookLoading(false)
             console.log(err, 'error');
             dispatch({
                 type: UESR_REGISTER_AND_LOGIN,

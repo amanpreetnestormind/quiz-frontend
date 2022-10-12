@@ -38,9 +38,6 @@ const Quiz_comp = ({ navigation }) => {
             // "Poppins": { uri: "https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" }
         })
     };
-    useEffect(() => {
-        LoadFonts()
-    }, [])
 
     const [animationState, setAnimationState] = useState({
         ready: false,
@@ -75,8 +72,8 @@ const Quiz_comp = ({ navigation }) => {
     const [correctAnswerCount, setCorrectAnswerCount] = useState(0)
 
     useEffect(() => {
-        dispatch(getQuestion())
-
+        // dispatch(getQuestion())
+        LoadFonts()
         if (!blinkingInterval) {
             setBlinkingInterval(setInterval(() => {
                 setIsBlinking(!isBlinking);
@@ -102,6 +99,7 @@ const Quiz_comp = ({ navigation }) => {
                 ...output,
                 count: 0
             })
+            setCorrectAnswerCount(0)
             setIsRestart(false)
         }
         _start()
@@ -267,7 +265,7 @@ const Quiz_comp = ({ navigation }) => {
                     <View
                         style={[
                             {
-                                width: "50%",
+                                // width: "50%",
                                 paddingLeft: 5,
                                 paddingRight: 5
                             },
@@ -288,8 +286,8 @@ const Quiz_comp = ({ navigation }) => {
                             }}>
                                 <Image source={require('../../assets/logout.png')} style={{
                                     marginRight: 6,
-                                    height: 25,
-                                    width: 25
+                                    height: 20,
+                                    width: 20
                                 }} />
                                 <Text style={styles['quit-text']}>Quit</Text>
                             </View>
@@ -298,7 +296,7 @@ const Quiz_comp = ({ navigation }) => {
                     <View
                         style={[
                             {
-                                width: "50%",
+                                // width: "50%",
                                 paddingLeft: 5,
                                 paddingRight: 5
                             }
@@ -350,24 +348,36 @@ const Quiz_comp = ({ navigation }) => {
         </Animated.View>}
 
         {!isLoading && currentIndex >= 11 && <View style={styles['result-page']}>
-            <Text style={[
+            {/* <Text style={[
                 styles['result-page-title'],
                 {
                     width: "100%",
                     textAlign: "center"
                 }
-            ]}>Quiz Result</Text>
+            ]}>Quiz Result</Text> */}
+
             <View style={{
                 width: "60%",
                 height: "30%",
                 alignItems: "center",
                 justifyContent: "center"
             }}>
-                <Image source={require('../../assets/gold-cup.png')} style={{
+                {correctAnswerCount <= 3 && <Image source={require('../../assets/images/medal.png')} style={{
                     height: 150,
                     width: 150,
-                }} />
-
+                }} />}
+                {correctAnswerCount > 3 && correctAnswerCount < 6 && <Image source={require('../../assets/images/medal.png')} style={{
+                    height: 150,
+                    width: 150,
+                }} />}
+                {correctAnswerCount > 6 && correctAnswerCount < 8 && <Image source={require('../../assets/images/medal.png')} style={{
+                    height: 150,
+                    width: 150,
+                }} />}
+                {correctAnswerCount >= 8 && <Image source={require('../../assets/gold-cup.png')} style={{
+                    height: 150,
+                    width: 150,
+                }} />}
             </View>
             <View style={{
                 alignItems: "center",
@@ -383,7 +393,8 @@ const Quiz_comp = ({ navigation }) => {
                         textAlign: "center",
                         fontFamily: "Poppins"
                     }
-                ]}>Congratulation!</Text>
+                ]}>{correctAnswerCount <= 3 ? "Better Luck Next Time" : correctAnswerCount > 3 && correctAnswerCount <= 5 ? "Better" : correctAnswerCount >= 6 && correctAnswerCount <= 8 ? "Brelient" : "Expert"}</Text>
+                {/* Congratulation! */}
                 <Text style={[
                     styles['result-page-title'],
                     {
@@ -435,7 +446,7 @@ const Quiz_comp = ({ navigation }) => {
                 <View
                     style={[
                         {
-                            width: "50%",
+                            // width: "50%",
                             paddingLeft: 5,
                             paddingRight: 5
                         },
@@ -466,39 +477,39 @@ const Quiz_comp = ({ navigation }) => {
                 <View
                     style={[
                         {
-                            width: "50%",
+                            // width: "50%",
                             paddingLeft: 5,
                             paddingRight: 5
                         }
                     ]}
                 >
                     <TouchableOpacity style={{
-                        height: 50,
-                        backgroundColor: colors.buttons.primary.background,
-                        width: "100%",
-                        borderWidth: 1,
-                        borderColor: colors.buttons.primary.background,
-                        borderRadius: 8,
-                        alignItems: "center",
-                        justifyContent: "center",
+                        // height: 45,
+                        // backgroundColor: colors.buttons.primary.background,
+                        // // width: "100%",
+                        // borderWidth: 1,
+                        // borderColor: colors.buttons.primary.background,
+                        // borderRadius: 8,
+                        // alignItems: "center",
+                        // justifyContent: "center",
                         ...styles.next
                     }}
                         onPress={() => {
                             setIsRestart(true)
-                            setCorrectAnswerCount(0)
+                            // setCorrectAnswerCount(0)
                             // setIsLoading(true)
                         }}>
                         <Text style={{
-                            // ...styles.nextText,
-                            color: colors.text.primary,
-                            // fontWeight: "700",
-                            fontSize: 20,
-                            minWidth: 200,
-                            textTransform: "uppercase",
-                            textAlign: "center",
-                            justifyContent: "center",
-                            alignItems: "center",
-                            fontFamily: "Poppins"
+                            ...styles.nextText,
+                            // color: colors.text.primary,
+                            // // fontWeight: "700",
+                            // fontSize: 20,
+                            // minWidth: 200,
+                            // textTransform: "uppercase",
+                            // textAlign: "center",
+                            // justifyContent: "center",
+                            // alignItems: "center",
+                            // fontFamily: "Poppins"
                         }}>Start Again</Text>
                     </TouchableOpacity>
                 </View>
@@ -566,8 +577,8 @@ const styles = StyleSheet.create({
         width: "100%",
         padding: 10,
         borderWidth: 1,
-        borderRadius: 30,
-        height: 60,
+        borderRadius: 10,
+        height: Platform.OS === "ios" ? 60 : 50,
         borderColor: "#fff",
         display: "flex",
         flexDirection: "row",
@@ -629,47 +640,49 @@ const styles = StyleSheet.create({
         bottom: 0,
         height: "10%",
         width: "100%",
+        alignSelf: "center"
     },
     'buttonContainer': {
         display: "flex",
         flexDirection: "row",
         justifyContent: "space-between",
+        alignItems: "center",
     },
     next: {
-        borderRadius: 30,
-        height: 50,
+        borderRadius: 10,
+        height: 45,
         borderWidth: 1,
         borderColor: colors.buttons.primary.background,
         backgroundColor: colors.buttons.primary.background,
-        paddingRight: 10,
-        paddingLeft: 10,
+        paddingRight: 20,
+        paddingLeft: 20,
         alignItems: "center",
         justifyContent: "center",
-        width: "100%",
+        // width: "100%",
     },
     nextText: {
         color: colors.text.primary,
-        fontSize: 20,
+        fontSize: 18,
         letterSpacing: .4,
         fontWeight: "400",
-        width: 100,
+        // width: 100,
         textAlign: "center",
         fontFamily: "Poppins"
     },
     quit: {
-        borderRadius: 30,
-        height: 50,
+        borderRadius: 50,
+        height: 45,
         paddingRight: 10,
         paddingLeft: 10,
         alignItems: "center",
         justifyContent: "center",
-        width: "100%",
+        // width: "100%",
     },
     'quit-text': {
         color: "#909090",
-        fontSize: 20,
+        fontSize: 14,
         letterSpacing: .4,
-        fontWeight: "400",
+        // fontWeight: "400",
         // textAlign: "center",
         width: 50,
         fontFamily: "Poppins"
@@ -716,11 +729,10 @@ const styles = StyleSheet.create({
         fontWeight: "600",
         fontSize: 16,
         letterSpacing: .5,
-        lineHeight: 30,
         display: "flex",
         paddingRight: 10,
-        paddingLeft: 40,
-        marginLeft: -25,
+        paddingLeft: 34,
+        marginLeft: Platform.OS === "ios" ? -25 : -30,
         height: 40,
         lineHeight: 40,
         alignItems: "center",

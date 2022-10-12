@@ -5,13 +5,18 @@ import colors from '../../../theme/colors'
 import useAuth from '../../hooks/useAuth'
 import * as Font from 'expo-font'
 import { Alert } from 'react-native'
+import { useDispatch } from 'react-redux'
+import { getQuestion } from '../../services/redux/action/actions'
+import { useSelector } from 'react-redux'
 
 const Confirmation = ({ navigation: { navigate } }) => {
     const [isSignedIn, loginUser, logoutUser] = useAuth()
+    const dispatch = useDispatch()
+    const selector = useSelector(_ => _)
+    const [totalCount, setTotalCount] = useState(0)
 
     const LoadFont = async () => {
         await Font.loadAsync({
-            // "Jura": require('../../../assets/fonts/Jura-VariableFont_wght.ttf')
             "Poppins": { uri: "https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" }
         })
     }
@@ -27,7 +32,12 @@ const Confirmation = ({ navigation: { navigate } }) => {
 
     useEffect(() => {
         LoadFont()
+        dispatch(getQuestion())
     }, [])
+
+    useEffect(() => {
+        setTotalCount(selector?.reducer?.question?.results?.length)
+    }, [selector])
 
     return (<View style={{ flex: 1 }}>
         <ImageBackground
@@ -74,7 +84,7 @@ const Confirmation = ({ navigation: { navigate } }) => {
                 </View>
                 <View style={[styles['button-container']]}>
                     <View style={[styles['inner-button']]}>
-                        <Pressable style={[styles['cancel-button']]}
+                        <TouchableOpacity style={[styles['cancel-button']]}
                             onPress={() => {
                                 confirmationModal()
                             }}>
@@ -91,15 +101,18 @@ const Confirmation = ({ navigation: { navigate } }) => {
                                 }} />
                                 <Text style={[styles['cancel-text']]}>Not Now</Text>
                             </View>
-                        </Pressable>
+                        </TouchableOpacity>
                     </View>
 
                     <View style={[styles['inner-button']]}>
-                        <Pressable style={[styles['start-button']]} onPress={() => {
-                            navigate('quiz_comp')
-                        }}>
+                        <TouchableOpacity style={[styles['start-button']]}
+                            onPress={() => {
+                                navigate('quiz_comp')
+                            }}
+                            disabled={totalCount == 0}
+                        >
                             <Text style={[styles['start-text']]}>Let's Begin</Text>
-                        </Pressable>
+                        </TouchableOpacity>
                     </View>
 
                 </View>
@@ -169,14 +182,14 @@ const styles = StyleSheet.create({
         width: "50%",
     },
     'cancel-button': {
-        height: 50,
+        height: 45,
         // width: "50%",
         borderRadius: 50,
         justifyContent: "center",
         alignItems: "center",
     },
     'start-button': {
-        height: 50,
+        height: 45,
         borderWidth: 1,
         borderColor: colors.buttons.primary.background,
         // width: "50%",
@@ -190,7 +203,7 @@ const styles = StyleSheet.create({
         color: colors.text.primary,
         fontSize: 18,
         letterSpacing: .4,
-        width: 200,
+        // width: 200,
         textAlign: "center",
         fontFamily: "Poppins",
         fontWeight: "500"
@@ -199,8 +212,8 @@ const styles = StyleSheet.create({
         textAlign: "center",
         fontFamily: "Poppins",
         color: "#909090",
-        fontSize: 18,
+        fontSize: 16,
         letterSpacing: .4,
-        width: 100
+        // width: 100
     }
 })
