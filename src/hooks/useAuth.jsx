@@ -19,7 +19,6 @@ const useAuth = () => {
 
     useEffect(() => {
         getUser()
-        // console.log(jwtDecode(signInUser?.data?.token||""));
     }, [])
 
     return [signInUser, getUser, logoutUser]

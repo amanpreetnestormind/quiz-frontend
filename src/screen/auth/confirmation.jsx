@@ -8,8 +8,11 @@ import { Alert } from 'react-native'
 import { useDispatch } from 'react-redux'
 import { getQuestion } from '../../services/redux/action/actions'
 import { useSelector } from 'react-redux'
+import { useNavigation } from '@react-navigation/native'
 
-const Confirmation = ({ navigation: { navigate } }) => {
+const Confirmation = () => {
+    const navigation = useNavigation()
+    const { navigate } = navigation
     const [isSignedIn, loginUser, logoutUser] = useAuth()
     const dispatch = useDispatch()
     const selector = useSelector(_ => _)
@@ -23,11 +26,15 @@ const Confirmation = ({ navigation: { navigate } }) => {
     const confirmationModal = () =>
         Alert.alert('Warning', 'Are you sure, You want to logout ?', [
             {
-                text: 'Cancel',
+                text: 'Deny',
                 onPress: () => console.log('Cancel Pressed'),
                 style: 'Deny',
             },
-            { text: 'Allow', onPress: () => logoutUser() },
+            {
+                text: 'Allow', onPress: () => {
+                    navigate('login')
+                }
+            },
         ]);
 
     useEffect(() => {
@@ -58,7 +65,7 @@ const Confirmation = ({ navigation: { navigate } }) => {
                         }}>
 
                         <Image
-                            source={isSignedIn?.data?.picture?.data?.url ? { uri: isSignedIn?.data?.picture?.data?.url } : require("../../../assets/robinCartoon.png")}
+                            source={isSignedIn?.data?.picture?.data?.url ? { uri: isSignedIn?.data?.picture?.data?.url } : require("../../../assets/user.png")}
                             style={[
                                 // styles.image,
                                 {
@@ -82,9 +89,19 @@ const Confirmation = ({ navigation: { navigate } }) => {
                         }}>Trust yourself</Text> you know more than you think you do.
                     </Text>
                 </View>
-                <View style={[styles['button-container']]}>
-                    <View style={[styles['inner-button']]}>
-                        <TouchableOpacity style={[styles['cancel-button']]}
+
+                <View style={styles['buttonContainer']}>
+                    <View
+                        style={[
+                            {
+                                paddingLeft: 5,
+                                paddingRight: 5
+                            },
+                        ]}>
+                        <TouchableOpacity
+                            style={{
+                                ...styles.quit
+                            }}
                             onPress={() => {
                                 confirmationModal()
                             }}>
@@ -92,26 +109,48 @@ const Confirmation = ({ navigation: { navigate } }) => {
                                 display: "flex",
                                 flexDirection: "row",
                                 justifyContent: "center",
-                                alignItems: "center",
+                                alignItems: "center"
                             }}>
                                 <Image source={require('../../../assets/logout.png')} style={{
                                     marginRight: 6,
-                                    height: 25,
-                                    width: 25,
+                                    height: 20,
+                                    width: 20
                                 }} />
-                                <Text style={[styles['cancel-text']]}>Not Now</Text>
+                                <Text style={styles['quit-text']}>Not Now</Text>
                             </View>
                         </TouchableOpacity>
                     </View>
-
-                    <View style={[styles['inner-button']]}>
-                        <TouchableOpacity style={[styles['start-button']]}
+                    <View
+                        style={[
+                            {
+                                paddingLeft: 5,
+                                paddingRight: 5
+                            }
+                        ]}
+                    >
+                        <TouchableOpacity
+                            style={{
+                                ...styles.next,
+                                backgroundColor: colors.buttons.primary.background,
+                                borderColor: colors.buttons.primary.background
+                            }}
                             onPress={() => {
                                 navigate('quiz_comp')
                             }}
                             disabled={totalCount == 0}
                         >
-                            <Text style={[styles['start-text']]}>Let's Begin</Text>
+                            <View style={{
+                                display: "flex",
+                                flexDirection: "row",
+                                justifyContent: "space-between",
+                                alignItems: "center"
+                            }}>
+                                <Text style={styles.nextText}>Let's Begin</Text>
+                                <Image source={require('../../../assets/rightIcon.png')} style={{
+                                    height: 10,
+                                    width: 15
+                                }} />
+                            </View>
                         </TouchableOpacity>
                     </View>
 
@@ -184,29 +223,28 @@ const styles = StyleSheet.create({
     'cancel-button': {
         height: 45,
         // width: "50%",
-        borderRadius: 50,
+        borderRadius: 10,
         justifyContent: "center",
         alignItems: "center",
     },
     'start-button': {
+        borderRadius: 10,
         height: 45,
         borderWidth: 1,
         borderColor: colors.buttons.primary.background,
-        // width: "50%",
-        // marginBottom: 20,
-        borderRadius: 50,
         backgroundColor: colors.buttons.primary.background,
+        // paddingRight: 10,
+        // paddingLeft: 10,
+        alignItems: "center",
         justifyContent: "center",
-        alignItems: "center"
     },
     'start-text': {
         color: colors.text.primary,
         fontSize: 18,
         letterSpacing: .4,
-        // width: 200,
+        fontWeight: "400",
         textAlign: "center",
-        fontFamily: "Poppins",
-        fontWeight: "500"
+        fontFamily: "Poppins"
     },
     'cancel-text': {
         textAlign: "center",
@@ -214,6 +252,43 @@ const styles = StyleSheet.create({
         color: "#909090",
         fontSize: 16,
         letterSpacing: .4,
-        // width: 100
-    }
+    },
+    'buttonContainer': {
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+    },
+    next: {
+        borderRadius: 10,
+        height: 45,
+        paddingRight: 10,
+        paddingLeft: 10,
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    nextText: {
+        color: colors.text.primary,
+        fontSize: 18,
+        letterSpacing: .4,
+        fontWeight: "400",
+        textAlign: "center",
+        fontFamily: "Poppins",
+        lineHeight: 48,
+        marginRight: 10
+    },
+    quit: {
+        borderRadius: 50,
+        height: 45,
+        paddingRight: 10,
+        paddingLeft: 10,
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    'quit-text': {
+        color: "#909090",
+        fontSize: 14,
+        letterSpacing: .4,
+        fontFamily: "Poppins"
+    },
 })

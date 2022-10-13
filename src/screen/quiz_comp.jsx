@@ -5,23 +5,28 @@ import colors from "../../theme/colors"
 import { getToken, removeItemValue, replaceString } from '../services/common_functions'
 import { getQuestion } from '../services/redux/action/actions'
 import { AntDesign } from '@expo/vector-icons'
-import { BackHandler } from 'react-native'
 import useAuth from '../hooks/useAuth'
 import * as Font from 'expo-font'
+import { useNavigation } from '@react-navigation/native'
+import { showMessage, hideMessage } from "react-native-flash-message";
 
-const Quiz_comp = ({ navigation }) => {
+const Quiz_comp = () => {
+    const navigation = useNavigation()
+    const { navigate } = navigation
     const [isSignedIn, isLoginUser, logoutUser] = useAuth()
 
     const confirmationModal = () =>
-        Alert.alert('Warning', 'Are you sure, You want to logout ?', [
+        Alert.alert('Warning', 'Are you sure, You want to Leave Quiz ?', [
             {
                 text: 'Deny',
                 onPress: () => console.log('Deny Pressed'),
                 style: 'Deny',
             },
             {
-                text: 'Allow', onPress: () => {
-                    logoutUser()
+                text: 'Allow', onPress: async () => {
+                    // await removeItemValue("quiz_app.user")
+                    navigate('confirmation')
+                    // logoutUser()
                 }
             },
         ]);
@@ -66,10 +71,10 @@ const Quiz_comp = ({ navigation }) => {
     const [answerSubmit, setAnswerSubmit] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
     const [style, setStyle] = useState(false)
-    const [loginUser, setLoginUser] = useState('')
     const [isBlinking, setIsBlinking] = useState(false)
     const [blinkingInterval, setBlinkingInterval] = useState(false);
     const [correctAnswerCount, setCorrectAnswerCount] = useState(0)
+    const [skipCount, setSkipCount] = useState(0)
 
     useEffect(() => {
         // dispatch(getQuestion())
@@ -136,9 +141,9 @@ const Quiz_comp = ({ navigation }) => {
                     styles['card-container']
                 ]}>
                 <Image
-                    source={isSignedIn?.data?.picture?.data?.url ? { uri: isSignedIn?.data?.picture?.data?.url } : require("../../assets/robinCartoon.png")}
+                    source={isSignedIn?.data?.picture?.data?.url ? { uri: isSignedIn?.data?.picture?.data?.url } : require("../../assets/user.png")}
                     style={[styles['card-image']]} />
-                <Text style={[styles['card-name-text']]}>{isSignedIn?.data?.userName}</Text>
+                <Text style={[styles['card-name-text']]}>{isSignedIn?.data?.userName || ""}</Text>
                 {/* <Image
                     source={require('../../assets/robinCartoon.png')}
                     style={[
@@ -151,7 +156,30 @@ const Quiz_comp = ({ navigation }) => {
         {!isLoading && currentIndex <= 10 && <View style={[
             styles["top-bar"]
         ]}>
-            <Text style={styles['quiz-type']}>Animals Quiz</Text>
+            <View style={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between"
+            }}>
+                <Text style={styles['quiz-type']}>Animals Quiz</Text>
+                <TouchableOpacity onPress={() => {
+                    if (skipCount < 3) {
+                        setSkipCount(skipCount + 1)
+                        setCurrentIndex(currentIndex + 1)
+                    } else {
+                        showMessage({
+                            message: "You can skip only 3 questions!",
+                            icon: {
+                                position: "right",
+                                icon: "warning"
+                            },
+                            backgroundColor: colors.buttons.primary.background
+                        })
+                    }
+                }}>
+                    <Text style={[styles['quiz-type'], { color: "#909090" }]}>Skip</Text>
+                </TouchableOpacity>
+            </View>
             <Text style={[
                 styles['question-title']
             ]}>Question
@@ -265,7 +293,6 @@ const Quiz_comp = ({ navigation }) => {
                     <View
                         style={[
                             {
-                                // width: "50%",
                                 paddingLeft: 5,
                                 paddingRight: 5
                             },
@@ -277,6 +304,11 @@ const Quiz_comp = ({ navigation }) => {
                             }}
                             onPress={() => {
                                 confirmationModal()
+                                // showMessage({
+                                //     message: "Simple message",
+                                //     type: "info",
+                                //     icon: {position:"right",icon:"danger"},
+                                // })
                             }}>
                             <View style={{
                                 display: "flex",
@@ -284,11 +316,12 @@ const Quiz_comp = ({ navigation }) => {
                                 justifyContent: "center",
                                 alignItems: "center"
                             }}>
-                                <Image source={require('../../assets/logout.png')} style={{
-                                    marginRight: 6,
-                                    height: 20,
-                                    width: 20
-                                }} />
+                                <Image source={require('../../assets/logout.png')}
+                                    style={{
+                                        marginRight: 6,
+                                        height: 20,
+                                        width: 20
+                                    }} />
                                 <Text style={styles['quit-text']}>Quit</Text>
                             </View>
                         </TouchableOpacity>
@@ -296,9 +329,8 @@ const Quiz_comp = ({ navigation }) => {
                     <View
                         style={[
                             {
-                                // width: "50%",
                                 paddingLeft: 5,
-                                paddingRight: 5
+                                paddingRight: 5,
                             }
                         ]}
                     >
@@ -306,6 +338,8 @@ const Quiz_comp = ({ navigation }) => {
                             style={{
                                 ...styles.next,
                                 display: currentIndex > 10 ? "none" : "flex",
+                                backgroundColor: isNext ? "#2B3047" : colors.buttons.primary.background,
+                                borderColor: isNext ? "#2B3047" : colors.buttons.primary.background
                             }}
                             disabled={isNext}
                             onPress={() => {
@@ -339,183 +373,174 @@ const Quiz_comp = ({ navigation }) => {
                                 })
                                 setCurrentIndex(currentIndex + 1)
                             }}>
-                            <Text style={styles.nextText}>Next</Text>
+                            <View style={{
+                                display: "flex",
+                                flexDirection: "row",
+                                justifyContent: "space-between",
+                                alignItems: "center"
+                            }}>
+                                <Text style={styles.nextText}>Next</Text>
+                                <Image source={require('../../assets/rightIcon.png')} style={{
+                                    height: 12,
+                                    width: Platform.OS == "ios" ? 20 : 15
+                                }} />
+                            </View>
                         </TouchableOpacity>
                     </View>
-
                 </View>
             </View>}
-        </Animated.View>}
+        </Animated.View>
+        }
 
-        {!isLoading && currentIndex >= 11 && <View style={styles['result-page']}>
-            {/* <Text style={[
-                styles['result-page-title'],
-                {
-                    width: "100%",
-                    textAlign: "center"
-                }
-            ]}>Quiz Result</Text> */}
-
-            <View style={{
-                width: "60%",
-                height: "30%",
-                alignItems: "center",
-                justifyContent: "center"
-            }}>
-                {correctAnswerCount <= 3 && <Image source={require('../../assets/images/medal.png')} style={{
-                    height: 150,
-                    width: 150,
-                }} />}
-                {correctAnswerCount > 3 && correctAnswerCount < 6 && <Image source={require('../../assets/images/medal.png')} style={{
-                    height: 150,
-                    width: 150,
-                }} />}
-                {correctAnswerCount > 6 && correctAnswerCount < 8 && <Image source={require('../../assets/images/medal.png')} style={{
-                    height: 150,
-                    width: 150,
-                }} />}
-                {correctAnswerCount >= 8 && <Image source={require('../../assets/gold-cup.png')} style={{
-                    height: 150,
-                    width: 150,
-                }} />}
-            </View>
-            <View style={{
-                alignItems: "center",
-                marginTop: 0,
-            }}>
-                <Text style={[
-                    styles['result-page-title'],
-                    {
-                        fontSize: 30,
-                        fontWeight: "bold",
-                        marginTop: 10,
-                        minWidth: 250,
-                        textAlign: "center",
-                        fontFamily: "Poppins"
-                    }
-                ]}>{correctAnswerCount <= 3 ? "Better Luck Next Time" : correctAnswerCount > 3 && correctAnswerCount <= 5 ? "Better" : correctAnswerCount >= 6 && correctAnswerCount <= 8 ? "Brelient" : "Expert"}</Text>
-                {/* Congratulation! */}
-                <Text style={[
-                    styles['result-page-title'],
-                    {
-                        fontSize: 14,
-                        marginTop: 0,
-                        textAlign: "center",
-                        letterSpacing: .5,
-                        lineHeight: 25,
-                        flexWrap: "wrap"
-                    }
-                ]}>
-                    Thank you, for putting in your precious time for the quiz
-                </Text>
-                <Text style={[
-                    styles['result-page-title'],
-                    {
-                        fontSize: 18,
-                        marginTop: 5,
-                        textAlign: "center",
-                        letterSpacing: .5,
-                        lineHeight: 25,
-                        textTransform: "uppercase",
-                        color: "#FFD700",
-                        width: 250
-                    }
-                ]}>
-                    your score
-                </Text>
-
-                <Text style={[
-                    styles['result-page-title'],
-                    {
-                        fontSize: 45,
-                        marginTop: 5,
-                        textAlign: "center",
-                        letterSpacing: .5,
-                        textTransform: "uppercase",
-                        width: 250
-                    }
-                ]}>
-                    <Text style={{
-                        color: "#00DAFF",
-                    }}>{correctAnswerCount}</Text>/10
-                </Text>
-            </View>
-        </View>}
-        {!isLoading && currentIndex >= 11 && <View style={[styles['footer']]}>
-            <View style={styles['buttonContainer']}>
-                <View
-                    style={[
-                        {
-                            // width: "50%",
-                            paddingLeft: 5,
-                            paddingRight: 5
-                        },
-                    ]}>
-                    <TouchableOpacity
-                        style={{
-                            ...styles.quit,
-                            display: currentIndex <= 10 ? "none" : "flex",
-                        }}
-                        onPress={() => {
-                            confirmationModal()
-                        }}>
-                        <View style={{
-                            display: "flex",
-                            flexDirection: "row",
-                            justifyContent: "center",
-                            alignItems: "center"
-                        }}>
-                            <Image source={require('../../assets/logout.png')} style={{
-                                marginRight: 6,
-                                height: 25,
-                                width: 25
-                            }} />
-                            <Text style={styles['quit-text']}>Quit</Text>
-                        </View>
-                    </TouchableOpacity>
+        {
+            !isLoading && currentIndex >= 11 && <View style={styles['result-page']}>
+                <View style={{
+                    width: "60%",
+                    height: "30%",
+                    alignItems: "center",
+                    justifyContent: "center"
+                }}>
+                    {correctAnswerCount <= 3 && <Image source={require('../../assets/images/medal.png')} style={{
+                        height: 150,
+                        width: 150,
+                    }} />}
+                    {correctAnswerCount > 3 && correctAnswerCount < 6 && <Image source={require('../../assets/images/medal.png')} style={{
+                        height: 150,
+                        width: 150,
+                    }} />}
+                    {correctAnswerCount > 6 && correctAnswerCount <= 8 && <Image source={require('../../assets/images/medal.png')} style={{
+                        height: 150,
+                        width: 150,
+                    }} />}
+                    {correctAnswerCount > 8 && <Image source={require('../../assets/gold-cup.png')} style={{
+                        height: 150,
+                        width: 150,
+                    }} />}
                 </View>
-                <View
-                    style={[
+                <View style={{
+                    alignItems: "center",
+                    marginTop: 0,
+                }}>
+                    <Text style={[
+                        styles['result-page-title'],
                         {
-                            // width: "50%",
-                            paddingLeft: 5,
-                            paddingRight: 5
+                            fontSize: 30,
+                            fontWeight: "bold",
+                            marginTop: 10,
+                            minWidth: 250,
+                            textAlign: "center",
+                            fontFamily: "Poppins"
                         }
-                    ]}
-                >
-                    <TouchableOpacity style={{
-                        // height: 45,
-                        // backgroundColor: colors.buttons.primary.background,
-                        // // width: "100%",
-                        // borderWidth: 1,
-                        // borderColor: colors.buttons.primary.background,
-                        // borderRadius: 8,
-                        // alignItems: "center",
-                        // justifyContent: "center",
-                        ...styles.next
-                    }}
-                        onPress={() => {
-                            setIsRestart(true)
-                            // setCorrectAnswerCount(0)
-                            // setIsLoading(true)
-                        }}>
+                    ]}>{correctAnswerCount <= 3 ? "Better luck next time" : correctAnswerCount > 3 && correctAnswerCount <= 5 ? "Better" : correctAnswerCount >= 6 && correctAnswerCount <= 8 ? "Brelient" : "Expert"}</Text>
+                    {/* Congratulation! */}
+                    <Text style={[
+                        styles['result-page-title'],
+                        {
+                            fontSize: 14,
+                            marginTop: 0,
+                            textAlign: "center",
+                            letterSpacing: .5,
+                            lineHeight: 25,
+                            flexWrap: "wrap"
+                        }
+                    ]}>
+                        Thank you! For putting in your precious time for the quiz. We hope you enjoyed and learned something new.
+                    </Text>
+                    <Text style={[
+                        styles['result-page-title'],
+                        {
+                            fontSize: 20,
+                            marginTop: 5,
+                            textAlign: "center",
+                            letterSpacing: .5,
+                            lineHeight: 25,
+                            textTransform: "uppercase",
+                            color: "#FFD700",
+                            width: 250
+                        }
+                    ]}>
+                        your score
+                    </Text>
+
+                    <Text style={[
+                        styles['result-page-title'],
+                        {
+                            fontSize: 50,
+                            marginTop: 5,
+                            textAlign: "center",
+                            letterSpacing: .5,
+                            textTransform: "uppercase",
+                            width: 250
+                        }
+                    ]}>
                         <Text style={{
-                            ...styles.nextText,
-                            // color: colors.text.primary,
-                            // // fontWeight: "700",
-                            // fontSize: 20,
-                            // minWidth: 200,
-                            // textTransform: "uppercase",
-                            // textAlign: "center",
-                            // justifyContent: "center",
-                            // alignItems: "center",
-                            // fontFamily: "Poppins"
-                        }}>Start Again</Text>
-                    </TouchableOpacity>
+                            color: "#00DAFF",
+                        }}>{correctAnswerCount}</Text>/10
+                    </Text>
                 </View>
             </View>
-        </View>}
-    </View>
+        }
+        {
+            !isLoading && currentIndex >= 11 && <View style={[styles['footer']]}>
+                <View style={styles['buttonContainer']}>
+                    <View
+                        style={[{ paddingLeft: 5, paddingRight: 5 }]}>
+                        <TouchableOpacity
+                            style={{
+                                ...styles.quit,
+                                display: currentIndex <= 10 ? "none" : "flex",
+                            }}
+                            onPress={() => {
+                                confirmationModal()
+                            }}>
+                            <View
+                                style={{
+                                    display: "flex",
+                                    flexDirection: "row",
+                                    justifyContent: "center",
+                                    alignItems: "center"
+                                }}>
+                                <Image
+                                    source={require('../../assets/logout.png')}
+                                    style={{
+                                        marginRight: 6,
+                                        height: 20,
+                                        width: 20
+                                    }} />
+                                <Text style={styles['quit-text']}>Quit</Text>
+                            </View>
+                        </TouchableOpacity>
+                    </View>
+                    <View
+                        style={[{ paddingLeft: 5, paddingRight: 5 }]}
+                    >
+                        <TouchableOpacity style={{
+                            ...styles.next,
+                            borderColor: colors.buttons.primary.background,
+                            // borderWidth: 1,
+                            backgroundColor: colors.buttons.primary.background
+                        }}
+                            onPress={() => {
+                                setIsRestart(true)
+                            }}>
+                            <View style={{
+                                display: "flex",
+                                flexDirection: "row",
+                                justifyContent: "space-between",
+                                alignItems: "center"
+                            }}>
+                                <Text style={{ ...styles.nextText }}>Start Again</Text>
+                                <Image source={require('../../assets/reload.png')} style={{
+                                    height: 15,
+                                    width: 15
+                                }} />
+                            </View>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </View>
+        }
+    </View >
 }
 
 export default Quiz_comp
@@ -524,7 +549,7 @@ const styles = StyleSheet.create({
     'main-container': {
         flex: 1,
         backgroundColor: colors.primary,
-        padding: 20,
+        padding: 10,
         position: "relative",
         paddingTop: 0,
         paddingBottom: 10
@@ -603,8 +628,8 @@ const styles = StyleSheet.create({
         color: colors.buttons.primary.background,
         width: 30,
         height: 30,
-        borderWidth: 1,
-        borderColor: colors.buttons.primary.background,
+        // borderWidth: 1,
+        // borderColor: colors.buttons.primary.background,
         borderRadius: 15,
         overflow: "hidden",
         backgroundColor: colors.buttons.primary.background,
@@ -649,25 +674,20 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     next: {
-        borderRadius: 10,
         height: 45,
-        borderWidth: 1,
-        borderColor: colors.buttons.primary.background,
-        backgroundColor: colors.buttons.primary.background,
-        paddingRight: 20,
-        paddingLeft: 20,
+        borderRadius: 10,
         alignItems: "center",
         justifyContent: "center",
-        // width: "100%",
+        paddingLeft: 10,
+        paddingRight: 10,
     },
     nextText: {
         color: colors.text.primary,
         fontSize: 18,
         letterSpacing: .4,
-        fontWeight: "400",
-        // width: 100,
-        textAlign: "center",
-        fontFamily: "Poppins"
+        lineHeight: Platform.OS == "ios" ? 45 : 47,
+        fontFamily: "Poppins",
+        marginRight: 10,
     },
     quit: {
         borderRadius: 50,
@@ -676,22 +696,19 @@ const styles = StyleSheet.create({
         paddingLeft: 10,
         alignItems: "center",
         justifyContent: "center",
-        // width: "100%",
     },
     'quit-text': {
         color: "#909090",
         fontSize: 14,
         letterSpacing: .4,
-        // fontWeight: "400",
-        // textAlign: "center",
-        width: 50,
-        fontFamily: "Poppins"
+        lineHeight: 45,
+        fontFamily: "Poppins",
+        borderColor: "#fff",
     },
     'result-page': {
         flex: 1,
         alignItems: "center",
         padding: 10,
-        // marginTop: 30,
     },
     'result-page-title': {
         color: colors.text.primary,
@@ -736,9 +753,13 @@ const styles = StyleSheet.create({
         height: 40,
         lineHeight: 40,
         alignItems: "center",
-        borderRadius: Platform.OS === "ios" ? 20 : 50,
         overflow: "hidden",
-        minWidth: Platform.OS === "ios" ? "20%" : "40%",
-        fontFamily: "Poppins"
+        minWidth: Platform.OS === "ios" ? "20%" : "30%",
+        fontFamily: "Poppins",
+        borderRadius: Platform.OS === "ios" ? 10 : 10,
+        // borderBottomRightRadius: Platform.OS === "ios" ? 20 : 10,
+        // borderTopRightRadius: Platform.OS === "ios" ? 20 : 10,
+        // borderWidth: 1,
+        // borderColor: colors.buttons.primary.background
     }
 })

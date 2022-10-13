@@ -1,15 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import { ActivityIndicator, Alert, Image, ImageBackground, Platform, SafeAreaView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import { Entypo, AntDesign, FontAwesome } from '@expo/vector-icons'
 import * as Facebook from 'expo-facebook';
 import axios from 'axios';
 import { useDispatch } from 'react-redux';
 import { userRegisterAndLogin } from '../../services/redux/action/actions';
 import colors from '../../../theme/colors';
-import { SvgUri, SvgXml } from 'react-native-svg';
-import SVGFacebook from '../../../assets/facebook.svg'
-import FacebookIcon from '../../components/Icons/facebook_icon';
 import { REACT_APP_FACEBOOK_ID } from '@env'
+import { Divider } from 'react-native-paper';
 
 // import { initializeApp } from 'firebase/app';
 // import {
@@ -84,81 +81,110 @@ const Login = ({ navigation }) => {
       </View>
     </View> */}
 
-    <Image
-      source={require('../../../assets/images/logo.png')}
-      style={{
-        resizeMode: "cover"
-      }} />
-    <View style={styles.footer}>
+    <View style={[
+      {
+        flex: 1,
+        width: "85%",
+        justifyContent: "center",
+        alignItems: "center"
+      }
+    ]}>
+      <Image
+        source={require('../../../assets/images/logo.png')}
+        style={{
+          resizeMode: "cover"
+        }} />
+    </View>
+    {/* <View style={[{
+      width: "85%",
+      flex: .3,
+      justifyContent: "center",
+      alignItems: "center"
+    }]}>
       <Text style={{
         color: "#fff",
-        fontSize: 20,
-        letterSpacing: .4,
         lineHeight: 30,
-        fontWeight: "400",
-        minWidth: 250,
-        textAlign: "center",
-        marginBottom: 10,
+        fontSize: 16,
         fontFamily: "Poppins"
-      }}>Sign Up With</Text>
-      <View style={styles['button-main-container']}>
-        <TouchableOpacity style={styles['button-container']}
-          onPress={async () => {
-            try {
-              setIsFacebookLoading(true)
-              await Facebook.initializeAsync({
-                appId: REACT_APP_FACEBOOK_ID
-              });
-              const { type, token, expirationDate, permissions, declinedPermissions } = await Facebook.logInWithReadPermissionsAsync({ permissions: ['public_profile'] });
-              if (type === 'success') {
-                // Get the user's name using Facebook's Graph API
-                axios.get(`https://graph.facebook.com/me?access_token=${token}&fields=id,name,email,about,picture.type(large)`).then(response => {
-                  setUserData({
-                    ...userData,
-                    facebookId: response.data.id,
-                    userEmail: response.data.email,
-                    userName: response.data.name
-                  })
-                  dispatch(userRegisterAndLogin({
-                    facebookId: response.data.id,
-                    userEmail: response.data.email,
-                    userName: response.data.name,
-                    googleId: "",
-                    ...response.data
-                  }, navigation.navigate, setIsFacebookLoading))
-
-                }).catch(err => {
-                  console.log(err, REACT_APP_FACEBOOK_ID, "REACT_APP_FACEBOOK_ID");
+      }} >Unsure about your GK ?</Text>
+      <Text style={{
+        color: "#fff",
+        lineHeight: 30,
+        fontSize: 22,
+        fontFamily: "Poppins"
+      }} >Start this quiz...</Text>
+    </View> */}
+    <View style={[{
+      flex: Platform.OS == "ios" ? .2 : .2,
+      width: "100%",
+      alignItems: "center"
+    }]}>
+      <View style={{
+        width: "80%",
+        alignItems: "center"
+      }}>
+        <Divider style={{
+          backgroundColor: "#707070",
+          width: "100%",
+          // position:"absolute",
+          top: 15,
+        }} />
+        <Text style={[
+          styles['login-text']
+        ]}>Sign-in with</Text>
+        <View style={styles['button-main-container']}>
+          <TouchableOpacity style={styles['button-container']}
+            onPress={async () => {
+              try {
+                setIsFacebookLoading(true)
+                await Facebook.initializeAsync({
+                  appId: REACT_APP_FACEBOOK_ID
                 });
-              } else {
-                // type === 'cancel'
-                console.log(REACT_APP_FACEBOOK_ID, "REACT_APP_FACEBOOK_ID");
+                const { type, token, expirationDate, permissions, declinedPermissions } = await Facebook.logInWithReadPermissionsAsync({ permissions: ['public_profile'] });
+                if (type === 'success') {
+                  // Get the user's name using Facebook's Graph API
+                  axios.get(`https://graph.facebook.com/me?access_token=${token}&fields=id,name,email,about,picture.type(large)`).then(response => {
+                    setUserData({
+                      ...userData,
+                      facebookId: response.data.id,
+                      userEmail: response.data.email,
+                      userName: response.data.name
+                    })
+                    dispatch(userRegisterAndLogin({
+                      facebookId: response.data.id,
+                      userEmail: response.data.email,
+                      userName: response.data.name,
+                      googleId: "",
+                      ...response.data
+                    }, navigation.navigate, setIsFacebookLoading))
+
+                  })
+                    .catch(err => {
+                      setIsFacebookLoading(false)
+                      console.log(err, REACT_APP_FACEBOOK_ID, "REACT_APP_FACEBOOK_ID");
+                    });
+                } else {
+                  // type === 'cancel'
+                  setIsFacebookLoading(false)
+                  console.log(REACT_APP_FACEBOOK_ID, "REACT_APP_FACEBOOK_ID");
+                }
+              } catch ({ message }) {
+                alert(`Facebook Login Error: ${message}`);
               }
-            } catch ({ message }) {
-              alert(`Facebook Login Error: ${message}`);
-            }
-          }}>
-          {!isFacebookLoading && <Image source={require('../../../assets/images/facebook.png')} style={{
-            backgroundColor: "transparent",
-            height: "80%",
-            width: "80%"
-          }} />}
-          {isFacebookLoading && <ActivityIndicator color={colors.buttons.primary.background} size="large" />}
-
-        </TouchableOpacity>
-        {/* <Text style={styles['button-text']}>
-            Login with Facebook</Text> */}
-
-        <TouchableOpacity style={styles['button-container']}>
-          {/* <FontAwesome name="google-plus-square" style={styles['icon-style']} /> */}
-          <Image source={require('../../../assets/images/google.png')} style={{
-            backgroundColor: "transparent",
-            height: "80%",
-            width: "80%"
-          }} />
-        </TouchableOpacity>
-        {/* <Text style={styles['button-text']}>
+            }}>
+            {!isFacebookLoading && <Image source={require('../../../assets/images/facebook.png')} style={[
+              styles['icon-image']
+            ]} />}
+            {isFacebookLoading && <ActivityIndicator color={colors.buttons.primary.background} size="large" />}
+          </TouchableOpacity>
+          <TouchableOpacity style={styles['button-container']}>
+            <Image source={require('../../../assets/images/google.png')} style={[
+              styles['icon-image']
+            ]} />
+          </TouchableOpacity>
+          {/* <Text style={styles['button-text']}>
             Login with Google</Text> */}
+        </View>
       </View>
     </View>
   </View >)
@@ -182,16 +208,14 @@ const styles = StyleSheet.create({
     flexDirection: "row"
   },
   "button-container": {
-    margin: 6,
+    margin: 8,
     width: 60,
     height: 60,
-    borderWidth: 1,
-    borderColor: "#06D3F6",
-    borderRadius: 8,
+    borderRadius: 50,
     padding: 5,
     justifyContent: "center",
-    alignItems: "center"
-
+    alignItems: "center",
+    backgroundColor: "#2B3047"
   },
   "button-text": {
     color: "#0E346D",
@@ -252,7 +276,7 @@ const styles = StyleSheet.create({
   },
   'footer': {
     width: "100%",
-    height: 160,
+    height: 120,
     position: "absolute",
     bottom: 20,
     justifyContent: "center",
@@ -266,5 +290,23 @@ const styles = StyleSheet.create({
     color: colors.text.primary,
     fontSize: 20,
     letterSpacing: .5
+  },
+  'login-text': {
+    color: "#909090",
+    fontSize: 13,
+    letterSpacing: .4,
+    lineHeight: 30,
+    fontWeight: "300",
+    textAlign: "center",
+    marginBottom: 10,
+    fontFamily: "Poppins",
+    backgroundColor: colors.primary,
+    paddingLeft: 10,
+    paddingRight: 10
+  },
+  'icon-image': {
+    backgroundColor: "transparent",
+    height: "60%",
+    width: "60%"
   }
 })

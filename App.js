@@ -7,15 +7,16 @@ import Login from './src/screen/auth'
 import Confirmation from './src/screen/auth/confirmation'
 import Quiz_comp from './src/screen/quiz_comp'
 import Store from './src/services/redux/store/store'
-import SplashScreen1 from './src/splashScreen'
+import SplashScreen from './src/splashScreen'
 import * as Font from 'expo-font'
 import useAuth from './src/hooks/useAuth'
 import { Platform } from 'react-native'
+import FlashMessage from 'react-native-flash-message'
 
 const App = () => {
   const [isSignedIn, isLoginUser, logoutUser] = useAuth()
   const Stack = createNativeStackNavigator()
-  
+
   const LoadFonts = async () => {
     await Font.loadAsync({
       "Poppins": require("./assets/fonts/Poppins-Medium.ttf")
@@ -37,13 +38,14 @@ const App = () => {
           }}>
           <Stack.Screen
             name='splash-screen'
-            component={SplashScreen1}
+            component={SplashScreen}
             options={{
               headerTransparent: false,
               headerTitle: () => null,
               headerShown: false,
               header: () => null
             }} />
+
           <Stack.Screen
             name='login'
             component={Login}
@@ -54,6 +56,7 @@ const App = () => {
               header: () => null,
             }}
           />
+
           <Stack.Screen
             name='quiz_comp'
             component={Quiz_comp}
@@ -93,6 +96,7 @@ const App = () => {
           />
 
         </Stack.Navigator>
+        <FlashMessage position="bottom" />
       </NavigationContainer>
     </Provider>
   )
