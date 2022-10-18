@@ -1,8 +1,9 @@
-import { GET_QUESTION, LOGIN_USER_WITH_FACEBOOK, LOGIN_USER_WITH_GOOGLE, UESR_REGISTER_AND_LOGIN } from "../store/constants"
+import { GET_QUESTION, GET_TODAYS_QUOTE, LOGIN_USER_WITH_FACEBOOK, LOGIN_USER_WITH_GOOGLE, UESR_REGISTER_AND_LOGIN } from "../store/constants"
 
 const initialState = {
     question: "",
-    registerAndLogin: {}
+    registerAndLogin: {},
+    quote: ""
 }
 
 const reducer = (state = initialState, actions) => {
@@ -19,6 +20,12 @@ const reducer = (state = initialState, actions) => {
             return {
                 ...state,
                 question: payload
+            }
+        }
+        case GET_TODAYS_QUOTE: {
+            return {
+                ...state,
+                quote: payload
             }
         }
         default: {

@@ -47,6 +47,13 @@ const Login = ({ navigation }) => {
   const [isFacebookLoading, setIsFacebookLoading] = useState(false)
   const [isSignedIn, loginUser, logoutUser] = useAuth()
 
+  useEffect(() => {
+    navigation.addListener('beforeRemove', (e) => {
+      e.preventDefault();
+      return
+    })
+  }, [])
+
   // const signIn = async () => {
   //     try {
   //         await GoogleSignin.hasPlayServices({ autoResolve: true, showPlayServicesUpdateDialog: true });

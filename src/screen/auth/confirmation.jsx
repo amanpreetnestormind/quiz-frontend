@@ -6,7 +6,7 @@ import useAuth from '../../hooks/useAuth'
 import * as Font from 'expo-font'
 import { Alert } from 'react-native'
 import { useDispatch } from 'react-redux'
-import { getQuestion } from '../../services/redux/action/actions'
+import { getQuestion, getTodaysQuote } from '../../services/redux/action/actions'
 import { useSelector } from 'react-redux'
 import { useNavigation } from '@react-navigation/native'
 
@@ -17,6 +17,7 @@ const Confirmation = () => {
     const dispatch = useDispatch()
     const selector = useSelector(_ => _)
     const [totalCount, setTotalCount] = useState(0)
+    const [quote, setQuote] = useState("")
 
     const LoadFont = async () => {
         await Font.loadAsync({
@@ -40,12 +41,19 @@ const Confirmation = () => {
     useEffect(() => {
         LoadFont()
         dispatch(getQuestion())
+        dispatch(getTodaysQuote())
     }, [])
 
     useEffect(() => {
+        dispatch(getTodaysQuote())
+    }, [navigation])
+
+    useEffect(() => {
         setTotalCount(selector?.reducer?.question?.results?.length)
+        setQuote(selector?.reducer?.quote?.attachments[0]?.text || "Trust yourself you know more than you think you do")
+        // setQuote(selector?.reducer?.quote?.quote?.body)
     }, [selector])
-    
+
     return (<View style={{ flex: 1 }}>
         <ImageBackground
             source={require("../../../assets/background.png")}
@@ -84,9 +92,10 @@ const Confirmation = () => {
                 </View>
                 <View style={[styles['text-container']]}>
                     <Text style={[styles['welcome-text']]}>
-                        <Text style={{
+                        {quote}
+                        {/* <Text style={{
                             fontWeight: "bold"
-                        }}>Trust yourself</Text> you know more than you think you do.
+                        }}>Trust yourself</Text> you know more than you think you do. */}
                     </Text>
                 </View>
 
@@ -173,21 +182,21 @@ const styles = StyleSheet.create({
     },
     'image-container': {
         width: "100%",
-        flex: 1,
+        flex: .50,
         justifyContent: "center",
-        alignItems: "center"
+        alignItems: "center",
     },
     'text-container': {
         flex: 1,
         alignItems: "center",
-        justifyContent: "center"
+        justifyContent: "center",
     },
     'welcome-text': {
         textAlign: "center",
         color: colors.text.primary,
         fontFamily: "Poppins",
-        fontSize: 15,
-        fontWeight: "500",
+        fontSize: 18,
+        fontWeight: "600",
         letterSpacing: .4,
         lineHeight: 30
     },
@@ -274,8 +283,8 @@ const styles = StyleSheet.create({
         fontWeight: "400",
         textAlign: "center",
         fontFamily: "Poppins",
-        lineHeight: Platform.OS == "ios" ? 48 : 0,
-        marginRight: 10
+        lineHeight: Platform.OS == "ios" ? 48 : 45,
+        marginRight: 10,
     },
     quit: {
         borderRadius: 50,

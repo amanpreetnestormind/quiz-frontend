@@ -53,9 +53,9 @@ const Quiz_comp = () => {
     const selector = useSelector(state => state)
     const [totalCount, setTotalCount] = useState(0)
     const [questions, setQuestions] = useState([])
-    const [currentIndex, setCurrentIndex] = useState(1)
+    const [currentIndex, setCurrentIndex] = useState(11)
     const [selectedIndex, setSelectedIndex] = useState(null)
-    const [isSubmit, setIsSubmit] = useState(true)
+    const [isRestartLoading, setIsRestartLoading] = useState(false)
     const [isNext, setIsNext] = useState(true)
     const [output, setOutput] = useState({
         count: 0,
@@ -71,7 +71,7 @@ const Quiz_comp = () => {
     const [style, setStyle] = useState(false)
     const [isBlinking, setIsBlinking] = useState(false)
     const [blinkingInterval, setBlinkingInterval] = useState(false);
-    const [correctAnswerCount, setCorrectAnswerCount] = useState(0)
+    const [correctAnswerCount, setCorrectAnswerCount] = useState(2)
     const [skipCount, setSkipCount] = useState(0)
 
     useEffect(() => {
@@ -83,10 +83,10 @@ const Quiz_comp = () => {
             }, 800));
         }
 
-        navigation.addListener('beforeRemove', (e) => {
-            e.preventDefault();
-            return
-        })
+        // navigation.addListener('beforeRemove', (e) => {
+        //     e.preventDefault();
+        //     return
+        // })
     }, [])
 
     useEffect(() => {
@@ -96,21 +96,23 @@ const Quiz_comp = () => {
 
     useEffect(() => {
         if (isRestart) {
-            dispatch(getQuestion())
-            setCurrentIndex(1)
-            setOutput({
-                ...output,
-                count: 0
-            })
-            setCorrectAnswerCount(0)
-            setIsRestart(false)
         }
         _start()
         if (isLoading) {
+            dispatch(getQuestion())
             setTimeout(() => {
-            }, 2000)
+                setCurrentIndex(1)
+                setOutput({
+                    ...output,
+                    count: 0
+                })
+                setCorrectAnswerCount(0)
+                setIsRestart(false)
+                setIsLoading(false)
+                // setIsRestartLoading(false)
+            }, 4000)
         }
-    }, [isRestart, isLoading])
+    }, [isRestart, isRestartLoading])
 
     const _start = () => {
         return Animated.parallel([
@@ -130,7 +132,7 @@ const Quiz_comp = () => {
         }}>
             <ActivityIndicator color="#fff" size="large" />
         </View>}
-        <View style={{
+        {!isLoading && <View style={{
             backgroundColor: colors.primary,
         }}>
             <StatusBar barStyle="light-content" hidden={false} />
@@ -150,7 +152,7 @@ const Quiz_comp = () => {
                 <Text
                     style={[styles['card-name-text']]}>Robin Sharma</Text> */}
             </View>
-        </View>
+        </View>}
         {!isLoading && currentIndex <= 10 && <View style={[
             styles["top-bar"]
         ]}>
@@ -399,15 +401,15 @@ const Quiz_comp = () => {
                     alignItems: "center",
                     justifyContent: "center"
                 }}>
-                    {correctAnswerCount <= 3 && <Image source={require('../../assets/images/medal.png')} style={{
+                    {correctAnswerCount <= 3 && <Image source={require('../../assets/images/sad.png')} style={{
                         height: 150,
                         width: 150,
                     }} />}
-                    {correctAnswerCount > 3 && correctAnswerCount < 6 && <Image source={require('../../assets/images/medal.png')} style={{
+                    {correctAnswerCount > 3 && correctAnswerCount <= 5 && <Image source={require('../../assets/images/better.png')} style={{
                         height: 150,
                         width: 150,
                     }} />}
-                    {correctAnswerCount > 6 && correctAnswerCount <= 8 && <Image source={require('../../assets/images/medal.png')} style={{
+                    {correctAnswerCount >= 6 && correctAnswerCount <= 8 && <Image source={require('../../assets/images/medal.png')} style={{
                         height: 150,
                         width: 150,
                     }} />}
@@ -521,6 +523,7 @@ const Quiz_comp = () => {
                         }}
                             onPress={() => {
                                 setIsRestart(true)
+                                setIsLoading(true)
                             }}>
                             <View style={{
                                 display: "flex",
@@ -529,10 +532,11 @@ const Quiz_comp = () => {
                                 alignItems: "center"
                             }}>
                                 <Text style={{ ...styles.nextText }}>Start Again</Text>
-                                <Image source={require('../../assets/reload.png')} style={{
+                                {!isLoading && <Image source={require('../../assets/reload.png')} style={{
                                     height: 15,
                                     width: 15
-                                }} />
+                                }} />}
+                                {isLoading && <ActivityIndicator size="small" color={"#fff"} />}
                             </View>
                         </TouchableOpacity>
                     </View>
