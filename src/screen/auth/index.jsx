@@ -7,6 +7,7 @@ import { userRegisterAndLogin } from '../../services/redux/action/actions';
 import colors from '../../../theme/colors';
 import { REACT_APP_FACEBOOK_ID } from '@env'
 import { Divider } from 'react-native-paper';
+import useAuth from '../../hooks/useAuth';
 
 // import { initializeApp } from 'firebase/app';
 // import {
@@ -44,6 +45,8 @@ const Login = ({ navigation }) => {
   })
   const dispatch = useDispatch()
   const [isFacebookLoading, setIsFacebookLoading] = useState(false)
+  const [isSignedIn, loginUser, logoutUser] = useAuth()
+
   // const signIn = async () => {
   //     try {
   //         await GoogleSignin.hasPlayServices({ autoResolve: true, showPlayServicesUpdateDialog: true });
@@ -135,41 +138,45 @@ const Login = ({ navigation }) => {
         <View style={styles['button-main-container']}>
           <TouchableOpacity style={styles['button-container']}
             onPress={async () => {
-              try {
-                setIsFacebookLoading(true)
-                await Facebook.initializeAsync({
-                  appId: REACT_APP_FACEBOOK_ID
-                });
-                const { type, token, expirationDate, permissions, declinedPermissions } = await Facebook.logInWithReadPermissionsAsync({ permissions: ['public_profile'] });
-                if (type === 'success') {
-                  // Get the user's name using Facebook's Graph API
-                  axios.get(`https://graph.facebook.com/me?access_token=${token}&fields=id,name,email,about,picture.type(large)`).then(response => {
-                    setUserData({
-                      ...userData,
-                      facebookId: response.data.id,
-                      userEmail: response.data.email,
-                      userName: response.data.name
-                    })
-                    dispatch(userRegisterAndLogin({
-                      facebookId: response.data.id,
-                      userEmail: response.data.email,
-                      userName: response.data.name,
-                      googleId: "",
-                      ...response.data
-                    }, navigation.navigate, setIsFacebookLoading))
+              if (isSignedIn?.data?.token) {
+                navigation.navigate('confirmation_window')
+              }
+              else {
+                try {
+                  setIsFacebookLoading(true)
+                  await Facebook.initializeAsync({
+                    appId: REACT_APP_FACEBOOK_ID
+                  });
+                  const { type, token, expirationDate, permissions, declinedPermissions } = await Facebook.logInWithReadPermissionsAsync({ permissions: ['public_profile'] });
+                  if (type === 'success') {
+                    // Get the user's name using Facebook's Graph API
+                    axios.get(`https://graph.facebook.com/me?access_token=${token}&fields=id,name,email,about,picture.type(large)`).then(response => {
+                      setUserData({
+                        ...userData,
+                        facebookId: response.data.id,
+                        userEmail: response.data.email,
+                        userName: response.data.name
+                      })
+                      dispatch(userRegisterAndLogin({
+                        facebookId: response.data.id,
+                        userEmail: response.data.email,
+                        userName: response.data.name,
+                        googleId: "",
+                        ...response.data
+                      }, navigation.navigate, setIsFacebookLoading))
 
-                  })
-                    .catch(err => {
-                      setIsFacebookLoading(false)
-                      console.log(err, REACT_APP_FACEBOOK_ID, "REACT_APP_FACEBOOK_ID");
-                    });
-                } else {
-                  // type === 'cancel'
-                  setIsFacebookLoading(false)
-                  console.log(REACT_APP_FACEBOOK_ID, "REACT_APP_FACEBOOK_ID");
+                    })
+                      .catch(err => {
+                        setIsFacebookLoading(false)
+                      });
+                  } else {
+                    // type === 'cancel'
+                    setIsFacebookLoading(false)
+                    console.log(REACT_APP_FACEBOOK_ID, "REACT_APP_FACEBOOK_ID");
+                  }
+                } catch ({ message }) {
+                  alert(`Facebook Login Error: ${message}`);
                 }
-              } catch ({ message }) {
-                alert(`Facebook Login Error: ${message}`);
               }
             }}>
             {!isFacebookLoading && <Image source={require('../../../assets/images/facebook.png')} style={[

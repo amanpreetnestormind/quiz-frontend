@@ -23,10 +23,8 @@ const Quiz_comp = () => {
                 style: 'Deny',
             },
             {
-                text: 'Allow', onPress: async () => {
-                    // await removeItemValue("quiz_app.user")
-                    navigate('confirmation')
-                    // logoutUser()
+                text: 'Allow', onPress: () => {
+                    navigate("confirmation_window")
                 }
             },
         ]);
@@ -304,6 +302,7 @@ const Quiz_comp = () => {
                             }}
                             onPress={() => {
                                 confirmationModal()
+                                // navigate('login')
                                 // showMessage({
                                 //     message: "Simple message",
                                 //     type: "info",

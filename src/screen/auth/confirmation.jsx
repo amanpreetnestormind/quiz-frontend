@@ -45,7 +45,7 @@ const Confirmation = () => {
     useEffect(() => {
         setTotalCount(selector?.reducer?.question?.results?.length)
     }, [selector])
-
+    
     return (<View style={{ flex: 1 }}>
         <ImageBackground
             source={require("../../../assets/background.png")}
@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
         fontWeight: "400",
         textAlign: "center",
         fontFamily: "Poppins",
-        lineHeight: 48,
+        lineHeight: Platform.OS == "ios" ? 48 : 0,
         marginRight: 10
     },
     quit: {

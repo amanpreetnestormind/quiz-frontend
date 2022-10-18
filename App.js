@@ -77,7 +77,7 @@ const App = () => {
           />
 
           <Stack.Screen
-            name='confirmation'
+            name='confirmation_window'
             component={Confirmation}
             options={{
               headerTitle: () => <View style={{

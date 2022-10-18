@@ -4,7 +4,15 @@
     "slug": "animals-quiz-app",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/appIcon.png",
+    "packagerOpts": {
+      "sourceExts": [
+        "js",
+        "ts",
+        "tsx",
+        "jsx"
+      ]
+    },
     "plugins": [
       [
         "expo-facebook",
@@ -28,13 +36,14 @@
     },
     "android": {
       "package": "com.amanpreet_singh.quizapp",
+      "versionCode": 1,
       "adaptiveIcon": {
-        "foregroundImage": "./assets/icon.png",
+        "foregroundImage": "./assets/appIcon.png",
         "backgroundColor": "#FFFFFF"
       }
     },
     "web": {
-      "favicon": "./assets/icon.png"
+      "favicon": "./assets/appIcon.png"
     },
     "description": ""
   }

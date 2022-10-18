@@ -22,7 +22,7 @@ const SplashScreen = ({ navigation }) => {
             setTimeout(async () => {
                 const res = await getToken("quiz_app.user")
                 if (res) {
-                    navigation.navigate('confirmation')
+                    navigation.navigate('confirmation_window')
                 }
                 else {
                     navigation.navigate("login")
