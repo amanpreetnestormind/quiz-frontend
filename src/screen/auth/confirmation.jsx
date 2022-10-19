@@ -49,8 +49,8 @@ const Confirmation = () => {
     }, [navigation])
 
     useEffect(() => {
-        setTotalCount(selector?.reducer?.question?.results?.length)
-        setQuote(selector?.reducer?.quote?.attachments[0]?.text || "Trust yourself you know more than you think you do")
+        // setTotalCount(selector?.reducer?.question?.results?.length)
+        // setQuote(selector?.reducer?.quote?.attachments[0]?.text || "Trust yourself you know more than you think you do")
         // setQuote(selector?.reducer?.quote?.quote?.body)
     }, [selector])
 
@@ -92,10 +92,10 @@ const Confirmation = () => {
                 </View>
                 <View style={[styles['text-container']]}>
                     <Text style={[styles['welcome-text']]}>
-                        {quote}
-                        {/* <Text style={{
+                        {/* {quote} */}
+                        <Text style={{
                             fontWeight: "bold"
-                        }}>Trust yourself</Text> you know more than you think you do. */}
+                        }}>Trust yourself</Text> you know more than you think you do.
                     </Text>
                 </View>
 

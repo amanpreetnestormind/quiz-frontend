@@ -53,7 +53,7 @@ const Quiz_comp = () => {
     const selector = useSelector(state => state)
     const [totalCount, setTotalCount] = useState(0)
     const [questions, setQuestions] = useState([])
-    const [currentIndex, setCurrentIndex] = useState(11)
+    const [currentIndex, setCurrentIndex] = useState(1)
     const [selectedIndex, setSelectedIndex] = useState(null)
     const [isRestartLoading, setIsRestartLoading] = useState(false)
     const [isNext, setIsNext] = useState(true)
@@ -71,7 +71,7 @@ const Quiz_comp = () => {
     const [style, setStyle] = useState(false)
     const [isBlinking, setIsBlinking] = useState(false)
     const [blinkingInterval, setBlinkingInterval] = useState(false);
-    const [correctAnswerCount, setCorrectAnswerCount] = useState(2)
+    const [correctAnswerCount, setCorrectAnswerCount] = useState(0)
     const [skipCount, setSkipCount] = useState(0)
 
     useEffect(() => {
